@@ -12,8 +12,24 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitStartbuildingblock(MiniPythonParser.StartbuildingblockContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var statementCtx = ctx.statement();
+		if (statementCtx != null) {
+			return this.visitStatement(statementCtx);
+		}
+		var funcDefCtx = ctx.funcDef();
+		if (funcDefCtx != null) {
+			return this.visitFuncDef(funcDefCtx);
+		}
+		var classDefCtx = ctx.classDef();
+		if (classDefCtx != null) {
+			return this.visitClassDef(classDefCtx);
+		}
+		var ifElifElseCtx = ctx.ifElifElse();
+		if (ifElifElseCtx != null) {
+			return this.visitIfElifElse(ifElifElseCtx);
+		}
+		var whileCallCtx = ctx.whileCall();
+		return this.visitWhileCall(whileCallCtx);
 	}
 
 	@Override
