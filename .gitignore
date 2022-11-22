@@ -1,0 +1,11 @@
+*.class
+MiniPython.interp
+MiniPython.tokens
+MiniPythonBaseListener.java
+MiniPythonBaseVisitor.java
+MiniPythonLexer.java
+MiniPythonLexer.interp
+MiniPythonLexer.tokens
+MiniPythonListener.java
+MiniPythonParser.java
+MiniPythonVisitor.java
