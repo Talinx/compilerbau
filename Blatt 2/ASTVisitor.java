@@ -63,8 +63,32 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitStatement(MiniPythonParser.StatementContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var ellipsisCtx = ctx.ellipsis();
+		if (ellipsisCtx != null) {
+			return this.visitEllipsis(ellipsisCtx);
+		}
+		var classDefCtx = ctx.classDef();
+		if (classDefCtx != null) {
+			return this.visitClassDef(classDefCtx);
+		}
+		var deffuncCtx = ctx.deffunc();
+		if (deffuncCtx != null) {
+			return this.visitDeffunc(deffuncCtx);
+		}
+		var variableAssignmentCtx = ctx.variableAssignment();
+		if (variableAssignmentCtx != null) {
+			return this.visitVariableAssignment(variableAssignmentCtx);
+		}
+		var ifElifElseCtx = ctx.ifElifElse();
+		if (ifElifElseCtx != null) {
+			return this.visitIfElifElse(ifElifElseCtx);
+		}
+		var whileCallCtx = ctx.whileCall();
+		if (whileCallCtx != null) {
+			return this.visitWhileCall(whileCallCtx);
+		}
+		var exprCtx = ctx.expr();
+		return this.visitExpr(exprCtx);
 	}
 
 	@Override
