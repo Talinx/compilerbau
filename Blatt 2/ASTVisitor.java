@@ -25,6 +25,10 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 	@Override
 	public ASTNode visitStartfile(MiniPythonParser.StartfileContext ctx) {
 		// TODO: implement
+		for (int i = 0; i < ctx.children.size(); i++) {
+			var subCtx = ctx.startbuildingblock(0);
+			this.visitStartbuildingblock(subCtx);
+		}
 		return new LiteralASTNode();
 	}
 
