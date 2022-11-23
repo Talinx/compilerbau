@@ -192,24 +192,6 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 	}
 
 	@Override
-	public ASTNode visitMathMulDiv(MiniPythonParser.MathMulDivContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
-	}
-
-	@Override
-	public ASTNode visitMathAddSub(MiniPythonParser.MathAddSubContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
-	}
-
-	@Override
-	public ASTNode visitAssertOperator(MiniPythonParser.AssertOperatorContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
-	}
-
-	@Override
 	public ASTNode visitBaseexpr(MiniPythonParser.BaseexprContext ctx) {
 		// TODO: implement
 		return new LiteralASTNode();

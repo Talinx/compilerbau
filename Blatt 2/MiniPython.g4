@@ -49,14 +49,14 @@ elses: 'else:' body ;
 
 whileCall: 'while' expr ':' body END ;
 
-mathMulDiv: DIVISION | MULTIPLICATION ;
-mathAddSub: ADDITION | SUBTRACTION ;
+MATHMULDIV: DIVISION | MULTIPLICATION ;
+MATHADDSUB: ADDITION | SUBTRACTION ;
 DIVISION:           '/' ;
 MULTIPLICATION:     '*' ;
 ADDITION:           '+' ;
 SUBTRACTION:        '-' ;
 
-assertOperator: ASSERTEQUAL | ASSERTLESS | ASSERTMORE | ASSERTLESSEQUAL | ASSERTMOREEQUAL | ASSERTNOTEQUAL;
+ASSERTOPERATOR: ASSERTEQUAL | ASSERTLESS | ASSERTMORE | ASSERTLESSEQUAL | ASSERTMOREEQUAL | ASSERTNOTEQUAL;
 ASSERTEQUAL:        '==';
 ASSERTNOTEQUAL:     '!=';
 ASSERTLESS:         '<' ;
@@ -65,9 +65,9 @@ ASSERTLESSEQUAL:    '<=';
 ASSERTMOREEQUAL:    '>=';
 
 baseexpr: literal | ID | funccall | classfunccall | classid | '(' expr ')' ;
-opadd: baseexpr (mathAddSub baseexpr)* ;
-opmul: opadd (mathMulDiv opadd)* | '(' expr ')' ;
-opcompare: opmul (assertOperator opmul)* | '(' expr ')' ;
+opadd: baseexpr (MATHADDSUB baseexpr)* ;
+opmul: opadd (MATHMULDIV opadd)* | '(' expr ')' ;
+opcompare: opmul (ASSERTOPERATOR opmul)* | '(' expr ')' ;
 opand: opcompare ('and' opcompare)* | '(' expr ')' ;
 opdisjunction: opand ('or' opand)* | '(' expr ')' ;
 opnot: opdisjunction | 'not' opnot ;
