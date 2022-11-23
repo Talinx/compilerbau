@@ -228,12 +228,6 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 	}
 
 	@Override
-	public ASTNode visitCompareoperator(MiniPythonParser.CompareoperatorContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
-	}
-
-	@Override
 	public ASTNode visitOpcompare(MiniPythonParser.OpcompareContext ctx) {
 		// TODO: implement
 		return new LiteralASTNode();
