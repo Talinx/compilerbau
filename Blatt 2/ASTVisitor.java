@@ -105,14 +105,24 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitClassid(MiniPythonParser.ClassidContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var classId = ctx.ID(0);
+		var id = ctx.ID(1);
+		return new IDASTNode(classId.getSymbol(), id.getSymbol());
 	}
 
 	@Override
 	public ASTNode visitVariableAssignment(MiniPythonParser.VariableAssignmentContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var id = ctx.ID();
+		IDASTNode idNode = null;
+		var classId = ctx.classid();
+		if (classId != null) {
+			idNode = (IDASTNode) this.visitClassid(classId);
+		} else {
+			idNode = new IDASTNode(id.getSymbol());
+		}
+		var exprCtx = ctx.expr();
+		var exprNode = this.visitExpr(exprCtx);
+		return new VariableAssignmentASTNode(idNode, exprNode);
 	}
 
 	@Override
@@ -231,26 +241,91 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitOpand(MiniPythonParser.OpandContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var exprCtx = ctx.expr();
+		if (exprCtx != null) {
+			return this.visitExpr(exprCtx);
+		}
+		var count = ctx.opcompare().size();
+		if (count == 1) {
+			return this.visitOpcompare(ctx.opcompare(0));
+		}
+		/*
+		visit A CMP B CMP C in such a way:
+				CMP
+			/		\
+			A		CMP
+				/		\
+				B		C
+		*/
+		AndASTNode output = null;
+		var lastCtx = ctx.opcompare(count - 1);
+		var secondToLastCtx = ctx.opcompare(count - 2);
+		var lastNode = this.visitOpcompare(lastCtx);
+		var secondToLastNode = this.visitOpcompare(secondToLastCtx);
+		output = new AndASTNode(secondToLastNode, lastNode);
+		for (int i = (count - 3); i >= 0; i--) {
+			var currentCtx = ctx.opcompare(i);
+			var currentNode = this.visitOpcompare(currentCtx);
+			output = new AndASTNode(currentNode, output);
+		}
+		return output;
 	}
 
 	@Override
 	public ASTNode visitOpdisjunction(MiniPythonParser.OpdisjunctionContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var exprCtx = ctx.expr();
+		if (exprCtx != null) {
+			return this.visitExpr(exprCtx);
+		}
+		var count = ctx.opand().size();
+		if (count == 1) {
+			return this.visitOpand(ctx.opand(0));
+		}
+		/*
+		visit A OR B OR C in such a way:
+				OR
+			/		\
+			A		OR
+				/		\
+				B		C
+		*/
+		OrASTNode output = null;
+		var lastCtx = ctx.opand(count - 1);
+		var secondToLastCtx = ctx.opand(count - 2);
+		var lastNode = this.visitOpand(lastCtx);
+		var secondToLastNode = this.visitOpand(secondToLastCtx);
+		output = new OrASTNode(secondToLastNode, lastNode);
+		for (int i = (count - 3); i >= 0; i--) {
+			var currentCtx = ctx.opand(i);
+			var currentNode = this.visitOpand(currentCtx);
+			output = new OrASTNode(currentNode, output);
+		}
+		return output;
 	}
 
 	@Override
 	public ASTNode visitOpnot(MiniPythonParser.OpnotContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var opdisjunctionCtx = ctx.opdisjunction();
+		if (opdisjunctionCtx != null) {
+			return this.visitOpdisjunction(opdisjunctionCtx);
+		}
+		var opnotCtx = ctx.opnot();
+		var opnotNode = this.visitOpnot(opnotCtx);
+		return new NotASTNode(opnotNode);
 	}
 
 	@Override
 	public ASTNode visitExpr(MiniPythonParser.ExprContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var funccallCtx = ctx.funccall();
+		if (funccallCtx != null) {
+			return this.visitFunccall(funccallCtx);
+		}
+		var exprCtx = ctx.expr();
+		if (exprCtx != null) {
+			return this.visitExpr(exprCtx);
+		}
+		var opnotCtx = ctx.opnot();
+		return this.visitOpnot(opnotCtx);
 	}
 
 	@Override
