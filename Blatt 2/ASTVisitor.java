@@ -211,8 +211,74 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitOpcompare(MiniPythonParser.OpcompareContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var exprCtx = ctx.expr();
+		if (exprCtx != null) {
+			return this.visitExpr(exprCtx);
+		}
+		var count = ctx.opmul().size();
+		if (count == 1) {
+			return this.visitOpmul(ctx.opmul(0));
+		}
+		/*
+		visit A CMP B CMP C in such a way:
+				CMP
+			/		\
+			A		CMP
+				/		\
+				B		C
+		*/
+		ASTNode output = null;
+		var lastCtx = ctx.opmul(count - 1);
+		var secondToLastCtx = ctx.opmul(count - 2);
+		var lastNode = this.visitOpmul(lastCtx);
+		var secondToLastNode = this.visitOpmul(secondToLastCtx);
+		var currentOperator = ctx.ASSERTOPERATOR(count - 2).getSymbol().getText();
+		switch (currentOperator) {
+		case "==":
+			output = new EqualsASTNode(secondToLastNode, lastNode);
+			break;
+		case "!=":
+			output = new NotEqualsASTNode(secondToLastNode, lastNode);
+			break;
+		case "<":
+			output = new LessASTNode(secondToLastNode, lastNode);
+			break;
+		case ">":
+			output = new GreaterASTNode(secondToLastNode, lastNode);
+			break;
+		case "<=":
+			output = new LessEqualsASTNode(secondToLastNode, lastNode);
+			break;
+		case ">=":
+			output = new GreaterEqualsASTNode(secondToLastNode, lastNode);
+			break;
+		}
+		for (int i = (count - 3); i >= 0; i--) {
+			var currentCtx = ctx.opmul(i);
+			var currentNode = this.visitOpmul(currentCtx);
+			currentOperator = ctx.ASSERTOPERATOR(i).getSymbol().getText();
+			switch (currentOperator) {
+			case "==":
+				output = new EqualsASTNode(currentNode, output);
+				break;
+			case "!=":
+				output = new NotEqualsASTNode(currentNode, output);
+				break;
+			case "<":
+				output = new LessASTNode(currentNode, output);
+				break;
+			case ">":
+				output = new GreaterASTNode(currentNode, output);
+				break;
+			case "<=":
+				output = new LessEqualsASTNode(currentNode, output);
+				break;
+			case ">=":
+				output = new GreaterEqualsASTNode(currentNode, output);
+				break;
+			}
+		}
+		return output;
 	}
 
 	@Override
@@ -226,10 +292,10 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 			return this.visitOpcompare(ctx.opcompare(0));
 		}
 		/*
-		visit A CMP B CMP C in such a way:
-				CMP
+		visit A AND B AND C in such a way:
+				AND
 			/		\
-			A		CMP
+			A		AND
 				/		\
 				B		C
 		*/
