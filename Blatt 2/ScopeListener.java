@@ -197,20 +197,7 @@ public class ScopeListener implements MiniPythonListener {
 		var id = ctx.ID(1).getSymbol().getText();
 		var classSymbol = scope.resolve(classId);
 		if (classSymbol == null) {
-			System.err.println("Class '" + classId + "' not found.");
-		} else if (classSymbol.getType().getName() != "class") {
-			System.err.println("'" + classId + "' is not a class.");
-		} else {
-			var classScope = scope.resolveClass(classId);
-			var symbolInClass = classScope.resolve(id);
-			if (symbolInClass == null) {
-				System.err.println("Class '" + classId + "' has no member '" + id + "'.");
-			} else {
-				var type = symbolInClass.getType();
-				if (type == null || !type.getName().equals("function")) {
-					System.err.println("Class '" + classId  + "' has a member '" + id + "', bit it is no function.");
-				}
-			}
+			System.err.println("Class instance '" + classId + "' not found.");
 		}
 	}
 
