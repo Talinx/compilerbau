@@ -93,7 +93,20 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterClassid(MiniPythonParser.ClassidContext ctx){
-
+		var classId = ctx.ID(0).getSymbol().getText();
+		var id = ctx.ID(1).getSymbol().getText();
+		var classSymbol = scope.resolve(classId);
+		if (classSymbol == null) {
+			System.err.println("Class '" + classId + "' not found.");
+		} else if (classSymbol.getType().getName() != "class") {
+			System.err.println("'" + classId + "' is not a class.");
+		} else {
+			var classScope = scope.resolveClass(classId);
+			var symbolInClass = classScope.resolve(id);
+			if (symbolInClass == null) {
+				System.err.println("Class '" + classId + "' has no member '" + id + "'");
+			}
+		}
 	}
 
 	public void exitClassid(MiniPythonParser.ClassidContext ctx){
@@ -159,7 +172,16 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterFunccall(MiniPythonParser.FunccallContext ctx){
-
+		var id = ctx.ID().getSymbol().getText();
+		var idSymbol = scope.resolve(id);
+		if (idSymbol == null) {
+			System.err.println("Function '" + id + "' not found.");
+		} else {
+			var type = idSymbol.getType();
+			if (type == null || !type.getName().equals("function")) {
+				System.err.println("'" + id + "' is not a function.");
+			}
+		}
 	}
 
 	public void exitFunccall(MiniPythonParser.FunccallContext ctx){
@@ -167,7 +189,25 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterClassfunccall(MiniPythonParser.ClassfunccallContext ctx){
-
+		var classId = ctx.ID(0).getSymbol().getText();
+		var id = ctx.ID(1).getSymbol().getText();
+		var classSymbol = scope.resolve(classId);
+		if (classSymbol == null) {
+			System.err.println("Class '" + classId + "' not found.");
+		} else if (classSymbol.getType().getName() != "class") {
+			System.err.println("'" + classId + "' is not a class.");
+		} else {
+			var classScope = scope.resolveClass(classId);
+			var symbolInClass = classScope.resolve(id);
+			if (symbolInClass == null) {
+				System.err.println("Class '" + classId + "' has no member '" + id + "'.");
+			} else {
+				var type = symbolInClass.getType();
+				if (type == null || !type.getName().equals("function")) {
+					System.err.println("Class '" + classId  + "' has a member '" + id + "', bit it is no function.");
+				}
+			}
+		}
 	}
 
 	public void exitClassfunccall(MiniPythonParser.ClassfunccallContext ctx){
@@ -207,7 +247,13 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterBaseexpr(MiniPythonParser.BaseexprContext ctx){
-
+		if (ctx.ID() != null) {
+			var id = ctx.ID().getSymbol().getText();
+			var idSymbol = scope.resolve(id);
+			if (idSymbol == null) {
+				System.err.println("'" + id + "' not found.");
+			}
+		}
 	}
 
 	public void exitBaseexpr(MiniPythonParser.BaseexprContext ctx){
