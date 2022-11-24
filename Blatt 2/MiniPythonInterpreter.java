@@ -32,6 +32,8 @@ class MiniPythonInterpreter {
 			var ast = (AST) astVisitor.visitStartfile(cst);
 			var scopeListener = new ScopeListener();
 			ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
+			var symbolTable = new SymbolTable(scopeListener.getScope());
+			symbolTable.print();
 		} catch (RecognitionException e) {
 			System.out.println("Something went wrong.");
 			System.exit(1);

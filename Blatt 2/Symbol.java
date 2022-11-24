@@ -19,6 +19,10 @@ public class Symbol {
 		return this.id;
 	}
 
+	public Type getType() {
+		return this.type;
+	}
+
 	public void setScope(Scope scope) {
 		this.scope = scope;
 	}

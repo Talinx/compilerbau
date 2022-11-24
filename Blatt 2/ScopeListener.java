@@ -7,6 +7,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class ScopeListener implements MiniPythonListener {
 	Scope scope;
 
+	public Scope getScope() {
+		return scope;
+	}
+
 	public void enterStartbuildingblock(MiniPythonParser.StartbuildingblockContext ctx){
 
 	}

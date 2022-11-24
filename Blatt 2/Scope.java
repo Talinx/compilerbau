@@ -71,4 +71,12 @@ public class Scope {
 	public Scope getEnclosingScope() {
 		return this.enclosingScope;
 	}
+
+	public Map<String, Symbol> getSymbols() {
+		return symbols;
+	}
+
+	public Map<String, Scope> getInnerScopes() {
+		return innerScopes;
+	}
 }
