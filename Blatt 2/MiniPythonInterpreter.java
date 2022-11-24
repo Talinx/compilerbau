@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 class MiniPythonInterpreter {
 	public static void main(String[] args) {
@@ -29,6 +30,8 @@ class MiniPythonInterpreter {
 			var cst = parser.startfile();
 			var astVisitor = new ASTVisitor();
 			var ast = (AST) astVisitor.visitStartfile(cst);
+			var scopeListener = new ScopeListener();
+			ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
 		} catch (RecognitionException e) {
 			System.out.println("Something went wrong.");
 			System.exit(1);
