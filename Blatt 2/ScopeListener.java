@@ -3,6 +3,8 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class ScopeListener implements MiniPythonListener {
+	Scope scope;
+
 	public void enterStartbuildingblock(MiniPythonParser.StartbuildingblockContext ctx){
 
 	}
@@ -12,7 +14,7 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterStart(MiniPythonParser.StartContext ctx){
-
+		scope = BuiltinIdsScope.getInstance();
 	}
 
 	public void exitStart(MiniPythonParser.StartContext ctx){
@@ -20,7 +22,7 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterStartfile(MiniPythonParser.StartfileContext ctx){
-
+		scope = BuiltinIdsScope.getInstance();
 	}
 
 	public void exitStartfile(MiniPythonParser.StartfileContext ctx){
@@ -52,11 +54,11 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterBody(MiniPythonParser.BodyContext ctx){
-
+		scope = new Scope(scope);
 	}
 
 	public void exitBody(MiniPythonParser.BodyContext ctx){
-
+		scope = scope.getEnclosingScope();
 	}
 
 	public void enterClassDef(MiniPythonParser.ClassDefContext ctx){
@@ -81,7 +83,9 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void exitVariableAssignment(MiniPythonParser.VariableAssignmentContext ctx){
-
+		var id = ctx.ID().getSymbol().getText();
+		var symbol = new Symbol(id);
+		scope.bind(symbol);
 	}
 
 	public void enterParameterdecl(MiniPythonParser.ParameterdeclContext ctx){

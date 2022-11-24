@@ -30,4 +30,8 @@ public class Scope {
 		symbols.put(symbol.getId(), symbol);
 		symbol.setScope(this);
 	}
+
+	public Scope getEnclosingScope() {
+		return this.enclosingScope;
+	}
 }

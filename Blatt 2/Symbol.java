@@ -3,6 +3,12 @@ public class Symbol {
 	Type type;
 	Scope scope;
 
+	public Symbol(String id) {
+		this.id = id;
+		this.type = null;
+		this.scope = null;
+	}
+
 	public Symbol(String id, Type type) {
 		this.id = id;
 		this.type = type;
