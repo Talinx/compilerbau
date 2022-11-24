@@ -32,7 +32,7 @@ public class Scope {
 	public ClassScope resolveClass(String id) {
 		try {
 			ClassScope thisAsClass = (ClassScope) this;
-			if (thisAsClass.getClassId().equals(id)) {
+			if (thisAsClass.getClassId().equals(id) || id.equals("self")) {
 				return thisAsClass;
 			}
 		} catch (ClassCastException e) {

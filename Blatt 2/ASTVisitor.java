@@ -161,16 +161,16 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitVariableAssignment(MiniPythonParser.VariableAssignmentContext ctx) {
-		var id = ctx.ID();
-		IDASTNode idNode = null;
-		var classId = ctx.classid();
-		if (classId != null) {
-			idNode = (IDASTNode) this.visitClassid(classId);
-		} else {
-			idNode = new IDASTNode(id.getSymbol());
-		}
 		var exprCtx = ctx.expr();
 		var exprNode = this.visitExpr(exprCtx);
+		if (ctx.ID().size() == 1) {
+			var id = ctx.ID(0);
+			var idNode = new IDASTNode(id.getSymbol());
+			return new VariableAssignmentASTNode(idNode, exprNode);
+		}
+		var classId = ctx.ID(0);
+		var id = ctx.ID(1);
+		var idNode = new IDASTNode(classId.getSymbol(), id.getSymbol());
 		return new VariableAssignmentASTNode(idNode, exprNode);
 	}
 

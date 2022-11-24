@@ -100,11 +100,16 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void exitVariableAssignment(MiniPythonParser.VariableAssignmentContext ctx){
-		var idTerminalNode = ctx.ID();
-		if (idTerminalNode != null) {
-			var id = ctx.ID().getSymbol().getText();
+		if (ctx.ID().size() == 1) {
+			var id = ctx.ID(0).getSymbol().getText();
 			var symbol = new Symbol(id);
 			scope.bind(symbol);
+		} else {
+			var classId = ctx.ID(0).getSymbol().getText();
+			var id = ctx.ID(1).getSymbol().getText();
+			var classScope = scope.resolveClass(classId);
+			var symbol = new Symbol(id);
+			classScope.bind(symbol);
 		}
 	}
 

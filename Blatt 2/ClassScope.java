@@ -16,6 +16,9 @@ public class ClassScope extends Scope {
 
 	@Override
 	public Symbol resolve(String id) {
+		if (id.equals("self")) {
+			return this.id;
+		}
 		var symbolFromThisScope = symbols.get(id);
 		if (symbolFromThisScope != null) {
 			return symbolFromThisScope;

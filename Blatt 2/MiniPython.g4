@@ -31,7 +31,7 @@ body: statement+ ;
 classDef: 'class' ID ('(' ID ')')? ':' variableAssignment* deffunc* END ;
 classid: ID '.' ID ;
 
-variableAssignment: ID '=' expr | classid '=' expr ;
+variableAssignment: ID '=' expr | ID '.' ID '=' expr ;
 
 parameterdecl: ID? | ID (',' ID)* ;
 deffunccontent: 'return' expr | body ('return' expr)? ;
