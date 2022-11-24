@@ -30,6 +30,9 @@ public class SymbolTable {
 				maxIdSize = currentId.length();
 			}
 		}
+		if (maxIdSize < 4) {
+			maxIdSize = 4;
+		}
 		var bar = "---------------";
 		for (int i = 0; i < maxIdSize; i++) {
 			bar += "-";
