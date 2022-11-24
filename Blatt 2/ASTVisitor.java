@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -42,23 +43,37 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 	public ASTNode visitStartfile(MiniPythonParser.StartfileContext ctx) {
 		// TODO: implement
 		for (int i = 0; i < ctx.children.size(); i++) {
-			var subCtx = ctx.startbuildingblock(0);
-			this.visitStartbuildingblock(subCtx);
+			var subCtx = ctx.startbuildingblock(i);
+			if (subCtx != null) {
+				this.visitStartbuildingblock(subCtx);
+			}
 		}
 		return new LiteralASTNode();
 	}
 
 	@Override
 	public ASTNode visitLiteral(MiniPythonParser.LiteralContext ctx) {
-		// super.visitLiteral(ctx); // TODO: is this necessary?
-		// TODO: get literal type, add value to node
-		return new LiteralASTNode();
+		var intLiteral = ctx.INTLITERAL();
+		if (intLiteral != null) {
+			return new IntLiteralASTNode(intLiteral.getSymbol().getText());
+		}
+		var stringLiteral = ctx.STRINGLITERAL();
+		if (stringLiteral != null) {
+			var strText = stringLiteral.getSymbol().getText();
+			var textWithoutQuotes = strText.substring(1, strText.length() - 1);
+			return new StringLiteralASTNode(textWithoutQuotes);
+		}
+		var booleanLiteral = ctx.BOOLEANLITERAL();
+		var booleanLiteralText = booleanLiteral.getSymbol().getText();
+		if (booleanLiteralText.equals("True")) {
+			return new BooleanLiteralASTNode(true);
+		}
+		return new BooleanLiteralASTNode(false);
 	}
 
 	@Override
 	public ASTNode visitEllipsis(MiniPythonParser.EllipsisContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		return new EllipsisASTNode();
 	}
 
 	@Override
@@ -88,13 +103,21 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 			return this.visitWhileCall(whileCallCtx);
 		}
 		var exprCtx = ctx.expr();
-		return this.visitExpr(exprCtx);
+		if (exprCtx != null) {
+			return this.visitExpr(exprCtx);
+		}
+		return new PassASTNode();
 	}
 
 	@Override
 	public ASTNode visitBody(MiniPythonParser.BodyContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var count = ctx.statement().size();
+		var statements = new ArrayList<ASTNode>(count);
+		for (int i = 0; i < count; i++) {
+			var statementNode = this.visitStatement(ctx.statement(i));
+			statements.add(i, statementNode);
+		}
+		return new BodyASTNode(statements);
 	}
 
 	@Override
@@ -127,20 +150,40 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitParameterdecl(MiniPythonParser.ParameterdeclContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var count = ctx.ID().size();
+		var parameters = new ArrayList<ParameterASTNode>(count);
+		for (int i = 0; i < count; i++) {
+			var idNode = new IDASTNode(ctx.ID(i).getSymbol());
+			var parameterNode = new ParameterASTNode(idNode);
+			parameters.add(i, parameterNode);
+		}
+		return new ParametersASTNode(parameters);
 	}
 
 	@Override
 	public ASTNode visitDeffunccontent(MiniPythonParser.DeffunccontentContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var bodyCtx = ctx.body();
+		BodyASTNode bodyNode = null;
+		if (bodyCtx != null) {
+			bodyNode = (BodyASTNode) this.visitBody(bodyCtx);
+		}
+		var exprCtx = ctx.expr();
+		ASTNode returnExprNode = null;
+		if (exprCtx != null) {
+			returnExprNode = this.visitExpr(exprCtx);
+		}
+		return new FunctionContentASTNode(bodyNode, returnExprNode);
 	}
 
 	@Override
 	public ASTNode visitDeffunc(MiniPythonParser.DeffuncContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var id = ctx.ID();
+		var idNode = new IDASTNode(id.getSymbol());
+		var parameterCtx = ctx.parameterdecl();
+		var parametersNode = (ParametersASTNode) this.visitParameterdecl(parameterCtx);
+		var contentCtx = ctx.deffunccontent();
+		var contentNode = (FunctionContentASTNode) this.visitDeffunccontent(contentCtx);
+		return new FunctionDefinitionASTNode(idNode, parametersNode, contentNode);
 	}
 
 	@Override
@@ -193,8 +236,28 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitBaseexpr(MiniPythonParser.BaseexprContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var literalCtx = ctx.literal();
+		if (literalCtx != null) {
+			return this.visitLiteral(literalCtx);
+		}
+		var funccallCtx = ctx.funccall();
+		if (funccallCtx != null) {
+			return this.visitFunccall(funccallCtx);
+		}
+		var classfunccallCtx = ctx.classfunccall();
+		if (classfunccallCtx != null) {
+			return this.visitClassfunccall(classfunccallCtx);
+		}
+		var classidCtx = ctx.classid();
+		if (classidCtx != null) {
+			return this.visitClassid(classidCtx);
+		}
+		var exprCtx = ctx.expr();
+		if (exprCtx != null) {
+			return this.visitExpr(exprCtx);
+		}
+		var id = ctx.ID();
+		return new IDASTNode(id.getSymbol());
 	}
 
 	@Override
