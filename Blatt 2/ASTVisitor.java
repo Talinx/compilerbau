@@ -122,8 +122,28 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitClassDef(MiniPythonParser.ClassDefContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var id = ctx.ID(0);
+		var idNode = new IDASTNode(id.getSymbol());
+		IDASTNode superIdNode = null;
+		if (ctx.ID().size() == 2) {
+			var superId = ctx.ID(1);
+			superIdNode = new IDASTNode(superId.getSymbol());
+		}
+		var variablesCount = ctx.variableAssignment().size();
+		var variables = new ArrayList<VariableAssignmentASTNode>(variablesCount);
+		for (int i = 0; i < variablesCount; i++) {
+			var variableCtx = ctx.variableAssignment(i);
+			var variableNode = (VariableAssignmentASTNode) this.visitVariableAssignment(variableCtx);
+			variables.add(i, variableNode);
+		}
+		var functionsCount = ctx.deffunc().size();
+		var functions = new ArrayList<FunctionDefinitionASTNode>(functionsCount);
+		for (int i = 0; i < functionsCount; i++) {
+			var functionCtx = ctx.deffunc(i);
+			var functionNode = (FunctionDefinitionASTNode) this.visitDeffunc(functionCtx);
+			functions.add(i, functionNode);
+		}
+		return new ClassASTNode(idNode, superIdNode, variables, functions);
 	}
 
 	@Override
@@ -188,44 +208,79 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitParametercall(MiniPythonParser.ParametercallContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var count = ctx.expr().size();
+		var arguments = new ArrayList<ASTNode>(count);
+		for (int i = 0; i < count; i++) {
+			var exprCtx = ctx.expr(i);
+			var exprNode = this.visitExpr(exprCtx);
+			arguments.add(i, exprNode);
+		}
+		return new ArgumentsASTNode(arguments);
 	}
 
 	@Override
 	public ASTNode visitFunccall(MiniPythonParser.FunccallContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var id = ctx.ID();
+		var idNode = new IDASTNode(id.getSymbol());
+		var argumentsCtx = ctx.parametercall();
+		var argumentsNode = (ArgumentsASTNode) this.visitParametercall(argumentsCtx);
+		return new FunctionCallASTNode(idNode, argumentsNode);
 	}
 
 	@Override
 	public ASTNode visitClassfunccall(MiniPythonParser.ClassfunccallContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var classId = ctx.ID(0);
+		var id = ctx.ID(1);
+		var idNode = new IDASTNode(classId.getSymbol(), id.getSymbol());
+		var argumentsCtx = ctx.parametercall();
+		var argumentsNode = (ArgumentsASTNode) this.visitParametercall(argumentsCtx);
+		return new FunctionCallASTNode(idNode, argumentsNode);
 	}
 
 	@Override
 	public ASTNode visitIfElifElse(MiniPythonParser.IfElifElseContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var exprCtx = ctx.expr();
+		var exprNode = this.visitExpr(exprCtx);
+		var bodyCtx = ctx.body();
+		var bodyNode = (BodyASTNode) this.visitBody(bodyCtx);
+		var elifsCount = ctx.elif().size();
+		var elifs = new ArrayList<ElifASTNode>(elifsCount);
+		for (int i = 0; i < elifsCount; i++) {
+			var elifCtx = ctx.elif(i);
+			var elifNode = (ElifASTNode) this.visitElif(elifCtx);
+			elifs.add(i, elifNode);
+		}
+		var elseCtx = ctx.elses();
+		ElseASTNode elseNode = null;
+		if (elseCtx != null) {
+			elseNode = (ElseASTNode) this.visitElses(elseCtx);
+		}
+		return new IfASTNode(exprNode, bodyNode, elifs, elseNode);
 	}
 
 	@Override
 	public ASTNode visitElif(MiniPythonParser.ElifContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var exprCtx = ctx.expr();
+		var exprNode = this.visitExpr(exprCtx);
+		var bodyCtx = ctx.body();
+		var bodyNode = (BodyASTNode) this.visitBody(bodyCtx);
+		return new ElifASTNode(exprNode, bodyNode);
 	}
 
 	@Override
 	public ASTNode visitElses(MiniPythonParser.ElsesContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var bodyCtx = ctx.body();
+		var bodyNode = (BodyASTNode) this.visitBody(bodyCtx);
+		return new ElseASTNode(bodyNode);
 	}
 
 	@Override
 	public ASTNode visitWhileCall(MiniPythonParser.WhileCallContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var exprCtx = ctx.expr();
+		var exprNode = this.visitExpr(exprCtx);
+		var bodyCtx = ctx.body();
+		var bodyNode = (BodyASTNode) this.visitBody(bodyCtx);
+		return new WhileASTNode(exprNode, bodyNode);
 	}
 
 	@Override
