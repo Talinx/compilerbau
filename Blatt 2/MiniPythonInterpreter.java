@@ -28,7 +28,7 @@ class MiniPythonInterpreter {
 		try {
 			var cst = parser.startfile();
 			var astVisitor = new ASTVisitor();
-			var ast = astVisitor.visitStartfile(cst);
+			var ast = (AST) astVisitor.visitStartfile(cst);
 		} catch (RecognitionException e) {
 			System.out.println("Something went wrong.");
 			System.exit(1);
