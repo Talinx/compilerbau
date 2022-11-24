@@ -93,7 +93,11 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void exitParameterdecl(MiniPythonParser.ParameterdeclContext ctx){
-
+		for (int i = 0; i < ctx.ID().size(); i++) {
+			var id = ctx.ID(i).getSymbol().getText();
+			var symbol = new Symbol(id);
+			scope.bind(symbol);
+		}
 	}
 	
 	public void enterDeffunccontent(MiniPythonParser.DeffunccontentContext ctx){
@@ -105,11 +109,14 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterDeffunc(MiniPythonParser.DeffuncContext ctx){
-
+		var id = ctx.ID().getSymbol().getText();
+		var symbol = new Symbol(id);
+		scope.bind(symbol);
+		scope = new Scope(scope);
 	}
 
 	public void exitDeffunc(MiniPythonParser.DeffuncContext ctx){
-
+		scope = scope.getEnclosingScope();
 	}
 
 	public void enterParametercall(MiniPythonParser.ParametercallContext ctx){
