@@ -79,7 +79,8 @@ public class ScopeListener implements MiniPythonListener {
 			parentScopes.add(0, parentScope);
 		}
 		var id = ctx.ID(0).getSymbol().getText();
-		var symbol = new Symbol(id);
+		var type = new ClassType();
+		var symbol = new Symbol(id, type);
 		scope.bind(symbol);
 		var oldScope = scope;
 		scope = new ClassScope(scope, new Symbol(id), parentScopes);
@@ -139,7 +140,8 @@ public class ScopeListener implements MiniPythonListener {
 
 	public void enterDeffunc(MiniPythonParser.DeffuncContext ctx){
 		var id = ctx.ID().getSymbol().getText();
-		var symbol = new Symbol(id);
+		var type = new FunctionType();
+		var symbol = new Symbol(id, type);
 		scope.bind(symbol);
 		scope = new Scope(scope);
 	}
