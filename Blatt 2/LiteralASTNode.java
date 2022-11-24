@@ -1,3 +1,3 @@
-public class LiteralASTNode extends ASTNode {
+public abstract class LiteralASTNode extends ASTNode {
 	
 }

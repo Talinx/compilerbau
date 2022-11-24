@@ -7,8 +7,8 @@ import org.antlr.v4.runtime.tree.RuleNode;
 public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 	@Override
 	public ASTNode visit(ParseTree tree) {
-		// TODO: implement
-		return new LiteralASTNode();
+		// should not be called
+		return new AST(new ArrayList<ASTNode>());
 	}
 
 	@Override
@@ -35,20 +35,26 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitStart(MiniPythonParser.StartContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var buildingBlockCount = ctx.startbuildingblock().size();
+		var buildingBlocks = new ArrayList<ASTNode>(buildingBlockCount);
+		for (int i = 0; i < buildingBlockCount; i++) {
+			var subCtx = ctx.startbuildingblock(i);
+			var node = this.visitStartbuildingblock(subCtx);
+			buildingBlocks.add(i, node);
+		}
+		return new AST(buildingBlocks);
 	}
 
 	@Override
 	public ASTNode visitStartfile(MiniPythonParser.StartfileContext ctx) {
-		// TODO: implement
-		for (int i = 0; i < ctx.children.size(); i++) {
+		var buildingBlockCount = ctx.startbuildingblock().size();
+		var buildingBlocks = new ArrayList<ASTNode>(buildingBlockCount);
+		for (int i = 0; i < buildingBlockCount; i++) {
 			var subCtx = ctx.startbuildingblock(i);
-			if (subCtx != null) {
-				this.visitStartbuildingblock(subCtx);
-			}
+			var node = this.visitStartbuildingblock(subCtx);
+			buildingBlocks.add(i, node);
 		}
-		return new LiteralASTNode();
+		return new AST(buildingBlocks);
 	}
 
 	@Override
@@ -564,19 +570,19 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitErrorNode(ErrorNode node) {
-		// TODO: implement
-		return new LiteralASTNode();
+		// should not be called
+		return new AST(new ArrayList<ASTNode>());
 	}
 
 	@Override
 	public ASTNode visitTerminal(TerminalNode node) {
-		// TODO: implement
-		return new LiteralASTNode();
+		// should not be called
+		return new AST(new ArrayList<ASTNode>());
 	}
 
 	@Override
 	public ASTNode visitChildren(RuleNode node) {
-		// TODO: implement
-		return new LiteralASTNode();
+		// should not be called
+		return new AST(new ArrayList<ASTNode>());
 	}
 }
