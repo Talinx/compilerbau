@@ -199,14 +199,94 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitOpadd(MiniPythonParser.OpaddContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var count = ctx.baseexpr().size();
+		if (count == 1) {
+			return this.visitBaseexpr(ctx.baseexpr(0));
+		}
+		/*
+		visit A +- B +- C in such a way:
+				+-
+			/		\
+			A		+-
+				/		\
+				B		C
+		*/
+		ASTNode output = null;
+		var lastCtx = ctx.baseexpr(count - 1);
+		var secondToLastCtx = ctx.baseexpr(count - 2);
+		var lastNode = this.visitBaseexpr(lastCtx);
+		var secondToLastNode = this.visitBaseexpr(secondToLastCtx);
+		var currentOperator = ctx.MATHADDSUB(count - 2).getSymbol().getText();
+		switch (currentOperator) {
+		case "+":
+			output = new PlusASTNode(secondToLastNode, lastNode);
+			break;
+		case "-":
+			output = new MinusASTNode(secondToLastNode, lastNode);
+			break;
+		}
+		for (int i = (count - 3); i >= 0; i--) {
+			var currentCtx = ctx.baseexpr(i);
+			var currentNode = this.visitBaseexpr(currentCtx);
+			currentOperator = ctx.MATHADDSUB(i).getSymbol().getText();
+			switch (currentOperator) {
+			case "+":
+				output = new PlusASTNode(currentNode, output);
+				break;
+			case "-":
+				output = new MinusASTNode(currentNode, output);
+				break;
+			}
+		}
+		return output;
 	}
 
 	@Override
 	public ASTNode visitOpmul(MiniPythonParser.OpmulContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
+		var exprCtx = ctx.expr();
+		if (exprCtx != null) {
+			return this.visitExpr(exprCtx);
+		}
+		var count = ctx.opadd().size();
+		if (count == 1) {
+			return this.visitOpadd(ctx.opadd(0));
+		}
+		/*
+		visit A * B * C in such a way:
+				*
+			/		\
+			A		*
+				/		\
+				B		C
+		*/
+		ASTNode output = null;
+		var lastCtx = ctx.opadd(count - 1);
+		var secondToLastCtx = ctx.opadd(count - 2);
+		var lastNode = this.visitOpadd(lastCtx);
+		var secondToLastNode = this.visitOpadd(secondToLastCtx);
+		var currentOperator = ctx.MATHMULDIV(count - 2).getSymbol().getText();
+		switch (currentOperator) {
+		case "*":
+			output = new MulASTNode(secondToLastNode, lastNode);
+			break;
+		case "/":
+			output = new DivASTNode(secondToLastNode, lastNode);
+			break;
+		}
+		for (int i = (count - 3); i >= 0; i--) {
+			var currentCtx = ctx.opadd(i);
+			var currentNode = this.visitOpadd(currentCtx);
+			currentOperator = ctx.MATHMULDIV(i).getSymbol().getText();
+			switch (currentOperator) {
+			case "*":
+				output = new MulASTNode(currentNode, output);
+				break;
+			case "/":
+				output = new DivASTNode(currentNode, output);
+				break;
+			}
+		}
+		return output;
 	}
 
 	@Override
