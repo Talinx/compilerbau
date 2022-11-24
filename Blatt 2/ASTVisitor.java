@@ -17,9 +17,9 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 		if (statementCtx != null) {
 			return this.visitStatement(statementCtx);
 		}
-		var funcDefCtx = ctx.funcDef();
-		if (funcDefCtx != null) {
-			return this.visitFuncDef(funcDefCtx);
+		var deffuncCtx = ctx.deffunc();
+		if (deffuncCtx != null) {
+			return this.visitDeffunc(deffuncCtx);
 		}
 		var classDefCtx = ctx.classDef();
 		if (classDefCtx != null) {
@@ -184,12 +184,6 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 		var contentCtx = ctx.deffunccontent();
 		var contentNode = (FunctionContentASTNode) this.visitDeffunccontent(contentCtx);
 		return new FunctionDefinitionASTNode(idNode, parametersNode, contentNode);
-	}
-
-	@Override
-	public ASTNode visitFuncDef(MiniPythonParser.FuncDefContext ctx) {
-		// TODO: implement
-		return new LiteralASTNode();
 	}
 
 	@Override

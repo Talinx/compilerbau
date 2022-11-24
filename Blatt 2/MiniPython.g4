@@ -1,7 +1,7 @@
 grammar MiniPython;
 
 
-startbuildingblock: statement | funcDef | classDef | ifElifElse | whileCall ;
+startbuildingblock: statement | deffunc | classDef | ifElifElse | whileCall ;
 start: startbuildingblock* ;
 startfile: startbuildingblock* EOF ;
 
@@ -36,7 +36,6 @@ variableAssignment: ID '=' expr | classid '=' expr ;
 parameterdecl: ID? | ID (',' ID)* ;
 deffunccontent: 'return' expr | body ('return' expr)? ;
 deffunc: 'def' ID '(' parameterdecl ')' ':' deffunccontent END ;
-funcDef: deffunc;
 
 parametercall: expr? | expr (',' expr)* ;
 funccall: ID '(' parametercall ')' ;
