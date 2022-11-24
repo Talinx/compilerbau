@@ -4,15 +4,18 @@ import java.util.HashMap;
 public class Scope {
 	Scope enclosingScope;
 	Map<String, Symbol> symbols;
+	Map<String, Scope> innerScopes;
 
 	public Scope() {
 		this.enclosingScope = null;
 		this.symbols = new HashMap<String, Symbol>();
+		this.innerScopes = new HashMap<String, Scope>();
 	}
 
 	public Scope(Scope enclosingScope) {
 		this.enclosingScope = enclosingScope;
 		this.symbols = new HashMap<String, Symbol>();
+		this.innerScopes = new HashMap<String, Scope>();
 	}
 	
 	public Symbol resolve(String id) {
@@ -26,9 +29,43 @@ public class Scope {
 		return null;
 	}
 
+	public ClassScope resolveClass(String id) {
+		try {
+			ClassScope thisAsClass = (ClassScope) this;
+			if (thisAsClass.getClassId().equals(id)) {
+				return thisAsClass;
+			}
+		} catch (ClassCastException e) {
+
+		}
+		var innerScope = this.innerScopes.get(id);
+		if (innerScope != null) {
+			try {
+				ClassScope innerAsClass = (ClassScope) innerScope;
+				if (innerAsClass.getClassId().equals(id)) {
+					return innerAsClass;
+				}
+			} catch (ClassCastException e) {
+
+			}
+		}
+		if (enclosingScope != null) {
+			return enclosingScope.resolveClass(id);
+		}
+		return null;
+	}
+
 	public void bind(Symbol symbol) {
 		symbols.put(symbol.getId(), symbol);
 		symbol.setScope(this);
+	}
+
+	public void bindScope(String id, Scope innerScope) {
+		innerScopes.put(id, innerScope);
+	}
+
+	public void bindScope(Symbol symbol, Scope innerScope) {
+		innerScopes.put(symbol.getId(), innerScope);
 	}
 
 	public Scope getEnclosingScope() {

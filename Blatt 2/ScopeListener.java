@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -62,12 +64,27 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterClassDef(MiniPythonParser.ClassDefContext ctx){
-
+		var parentId = ctx.ID(1);
+		ArrayList<ClassScope> parentScopes = null;
+		if (parentId == null) {
+			parentScopes = new ArrayList<ClassScope>(0);
+		} else {
+			var parentScopeSymbol = scope.resolve(ctx.ID(1).getSymbol().getText());
+			var parentScope = scope.resolveClass(parentScopeSymbol.getId());
+			parentScopes = new ArrayList<ClassScope>(1);
+			parentScopes.add(0, parentScope);
+		}
+		var id = ctx.ID(0).getSymbol().getText();
+		var symbol = new Symbol(id);
+		scope.bind(symbol);
+		var oldScope = scope;
+		scope = new ClassScope(scope, new Symbol(id), parentScopes);
+		oldScope.bindScope(id, scope);
 	}
 
 
 	public void exitClassDef(MiniPythonParser.ClassDefContext ctx){
-
+		scope = scope.getEnclosingScope();
 	}
 
 	public void enterClassid(MiniPythonParser.ClassidContext ctx){
@@ -83,9 +100,12 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void exitVariableAssignment(MiniPythonParser.VariableAssignmentContext ctx){
-		var id = ctx.ID().getSymbol().getText();
-		var symbol = new Symbol(id);
-		scope.bind(symbol);
+		var idTerminalNode = ctx.ID();
+		if (idTerminalNode != null) {
+			var id = ctx.ID().getSymbol().getText();
+			var symbol = new Symbol(id);
+			scope.bind(symbol);
+		}
 	}
 
 	public void enterParameterdecl(MiniPythonParser.ParameterdeclContext ctx){
