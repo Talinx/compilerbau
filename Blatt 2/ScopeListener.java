@@ -16,7 +16,7 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterStart(MiniPythonParser.StartContext ctx){
-		scope = BuiltinIdsScope.getInstance();
+		scope = new BuiltinIdsScope();
 	}
 
 	public void exitStart(MiniPythonParser.StartContext ctx){
@@ -24,7 +24,7 @@ public class ScopeListener implements MiniPythonListener {
 	}
 
 	public void enterStartfile(MiniPythonParser.StartfileContext ctx){
-		scope = BuiltinIdsScope.getInstance();
+		scope = new BuiltinIdsScope();
 	}
 
 	public void exitStartfile(MiniPythonParser.StartfileContext ctx){
