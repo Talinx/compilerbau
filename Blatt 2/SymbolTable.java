@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 public class SymbolTable {
 	Scope scope;
-	int indentation = 1; // number of spaces for indentation
+	int indentation = 2; // number of spaces for indentation
 
 	private int getMaxIdSize() {
 		return getMaxIdSize(this.scope, 0);
@@ -38,12 +38,6 @@ public class SymbolTable {
 	}
 
 	private void printScope(Scope scope, int level, int maxIdSize) {
-		var bar = "---------------";
-		for (int i = 0; i < maxIdSize; i++) {
-			bar += "-";
-		}
-		if (level != 0)
-			System.out.println(bar);
 		var skipSet = new HashSet<Scope>();
 		var innerScopes = scope.getInnerScopes();
 		var symbols = new ArrayList<Symbol>();
