@@ -124,14 +124,22 @@ public class ScopeListener implements MiniPythonListener {
 	public void exitVariableAssignment(MiniPythonParser.VariableAssignmentContext ctx){
 		if (ctx.ID().size() == 1) {
 			var id = ctx.ID(0).getSymbol().getText();
-			var symbol = new Symbol(id);
-			scope.bind(symbol);
+            if (scope.resolve(id) == null) {
+                var symbol = new Symbol(id);
+                scope.bind(symbol);
+            }
 		} else {
 			var classId = ctx.ID(0).getSymbol().getText();
 			var id = ctx.ID(1).getSymbol().getText();
 			var classScope = scope.resolveClass(classId);
-			var symbol = new Symbol(id);
-			classScope.bind(symbol);
+            if (classScope == null)
+                System.err.println("Scope for class " + classId + " not found");
+            else {
+                if (classScope.resolveAttribute(id) == null) {
+                    var symbol = new Symbol(id);
+                    classScope.bind(symbol);
+                }
+            }
 		}
 	}
 

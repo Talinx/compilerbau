@@ -34,4 +34,25 @@ public class ClassScope extends Scope {
 		}
 		return null;
 	}
+
+    public Symbol resolveAttribute(String id) {
+        var symbolFromThisScope = symbols.get(id);
+        if (symbolFromThisScope != null) {
+            return symbolFromThisScope;
+        }
+
+		var innerScope = this.innerScopes.get(id);
+		if (innerScope != null) {
+			try {
+				ClassScope innerAsClass = (ClassScope) innerScope;
+                var symbolFromImmerScope = innerAsClass.resolveAttribute(id);
+				if (symbolFromImmerScope != null) {
+					return symbolFromImmerScope;
+				}
+			} catch (ClassCastException e) {
+
+			}
+		}
+		return null;
+    }
 }
