@@ -1,0 +1,13 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "Blatt 2/lib/antlr-4.11.1-complete.jar"
+    ],
+    "antlr4.generation": {
+        "mode": "external",
+        "language": "Java",
+        "listeners": true,
+        "visitors": true,
+        "alternativeJar": "lib/antlr-4.11.1-complete.jar"
+    },
+}

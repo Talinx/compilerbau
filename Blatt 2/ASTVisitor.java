@@ -188,17 +188,20 @@ public class ASTVisitor implements MiniPythonVisitor<ASTNode> {
 
 	@Override
 	public ASTNode visitDeffunccontent(MiniPythonParser.DeffunccontentContext ctx) {
-		var bodyCtx = ctx.body();
-		BodyASTNode bodyNode = null;
-		if (bodyCtx != null) {
-			bodyNode = (BodyASTNode) this.visitBody(bodyCtx);
+        var count = ctx.statement().size();
+		var statements = new ArrayList<ASTNode>(count);
+		for (int i = 0; i < count; i++) {
+			var statementNode = this.visitStatement(ctx.statement(i));
+			statements.add(i, statementNode);
 		}
+
 		var exprCtx = ctx.expr();
 		ASTNode returnExprNode = null;
 		if (exprCtx != null) {
 			returnExprNode = this.visitExpr(exprCtx);
 		}
-		return new FunctionContentASTNode(bodyNode, returnExprNode);
+
+		return new FunctionContentASTNode(statements, returnExprNode);
 	}
 
 	@Override

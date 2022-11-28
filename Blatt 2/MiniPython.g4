@@ -34,7 +34,7 @@ classid: ID '.' ID ;
 variableAssignment: ID '=' expr | ID '.' ID '=' expr ;
 
 parameterdecl: ID? | ID (',' ID)* ;
-deffunccontent: 'return' expr | body ('return' expr)? ;
+deffunccontent: 'return' expr | statement+ ('return' expr)? ;
 deffunc: 'def' ID '(' parameterdecl ')' ':' deffunccontent END ;
 
 parametercall: expr? | expr (',' expr)* ;

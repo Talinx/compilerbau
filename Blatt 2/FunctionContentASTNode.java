@@ -1,9 +1,11 @@
+import java.util.List;
+
 public class FunctionContentASTNode extends ASTNode {
-	BodyASTNode body;
+	List<ASTNode> statements;
 	ASTNode returnExpr;
 	
-	public FunctionContentASTNode(BodyASTNode body, ASTNode returnExpr) {
-		this.body = body;
+	public FunctionContentASTNode(List<ASTNode> statements, ASTNode returnExpr) {
+		this.statements = statements;
 		this.returnExpr = returnExpr;
 	}
 }
