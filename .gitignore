@@ -9,3 +9,4 @@ MiniPythonLexer.tokens
 MiniPythonListener.java
 MiniPythonParser.java
 MiniPythonVisitor.java
+lib/
