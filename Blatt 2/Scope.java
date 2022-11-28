@@ -18,6 +18,13 @@ public class Scope {
 		this.innerScopes = new HashMap<String, Scope>();
         this.enclosingScope.bindScope(new Symbol(""), this);
 	}
+
+	public Scope(Scope enclosingScope, String enclosingScopeName) {
+		this.enclosingScope = enclosingScope;
+		this.symbols = new HashMap<String, Symbol>();
+		this.innerScopes = new HashMap<String, Scope>();
+        this.enclosingScope.bindScope(new Symbol(enclosingScopeName), this);
+	}
 	
 	public Symbol resolve(String id) {
 		var symbolFromThisScope = symbols.get(id);

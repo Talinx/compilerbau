@@ -80,10 +80,15 @@ public class SymbolTable {
 			if (currentType != null) {
 				if (currentType.getName().equals("class")) {
 					for (Entry<String, Scope> entry : innerScopes.entrySet()) {
-						var scopeOfClass = entry.getValue().resolveClass(currentSymbolId);
-						if (scopeOfClass != null) {
-							skipSet.add(entry.getValue());
-							printScope(scopeOfClass, level + 1, maxIdSize);
+						try {
+							ClassScope scopeOfClass = (ClassScope) entry.getValue();
+							if (scopeOfClass != null && scopeOfClass.getClassId().equals(currentSymbolId)) {
+								skipSet.add(entry.getValue());
+								printScope(scopeOfClass, level + 1, maxIdSize);
+								break;
+							}
+						} catch (ClassCastException e) {
+
 						}
 					}
 				}
