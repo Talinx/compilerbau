@@ -42,7 +42,8 @@ public class SymbolTable {
 		for (int i = 0; i < maxIdSize; i++) {
 			bar += "-";
 		}
-		System.out.println(bar);
+		if (level != 0)
+			System.out.println(bar);
 		var skipSet = new HashSet<Scope>();
 		var innerScopes = scope.getInnerScopes();
 		var symbols = new ArrayList<Symbol>();
