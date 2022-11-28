@@ -91,6 +91,20 @@ public class SymbolTable {
 
 						}
 					}
+				} else
+				if (currentType.getName().equals("function")) {
+					for (Entry<String, Scope> entry : innerScopes.entrySet()) {
+						try {
+							FunctionScope scopeOfFunction = (FunctionScope) entry.getValue();
+							if (scopeOfFunction != null && scopeOfFunction.getFunctionId().equals(currentSymbolId)) {
+								skipSet.add(entry.getValue());
+								printScope(scopeOfFunction, level + 1, maxIdSize);
+								break;
+							}
+						} catch (ClassCastException e) {
+
+						}
+					}
 				}
 			}
 		}

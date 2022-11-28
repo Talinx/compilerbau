@@ -168,7 +168,7 @@ public class ScopeListener implements MiniPythonListener {
 		var type = new FunctionType();
 		var symbol = new Symbol(id, type);
 		scope.bind(symbol);
-		scope = new Scope(scope, id);
+		scope = new FunctionScope(scope, symbol);
 	}
 
 	public void exitDeffunc(MiniPythonParser.DeffuncContext ctx){
