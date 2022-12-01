@@ -1,7 +1,7 @@
 #!/bin/bash
 COUNT_FAILED=0
 echo "These should pass:"
-for f in testfiles/*.py		
+for f in ../../testfiles/*.py		
 do
 	echo "$f" | grep "error" > /dev/null
 	EXIT_STATUS=$?
@@ -18,7 +18,7 @@ do
 	fi
 done
 echo "These should fail:"
-for f in testfiles/*.py		
+for f in ../../testfiles/*.py		
 do
 	echo "$f" | grep "error" > /dev/null
 	EXIT_STATUS=$?
