@@ -33,8 +33,18 @@ public class ControlFlowGraph<T> {
 	private static List<ASTNode> processLevel(ControlFlowGraph<List<ASTNode>> cfg, List<ASTNode> part, List<ASTNode> parentLevel, List<CallMetaInfo> ids, Stack<CallMetaInfo> functionCalls) {
 		List<ASTNode> level = new ArrayList<ASTNode>();
 		ASTNode currentNode;
+		List<ASTNode> preparedPart = new ArrayList<ASTNode>();
+		VariableAssignmentASTNode varASTNode;
 		for (int i = 0; i < part.size(); i++) {
 			currentNode = part.get(i);
+			if (currentNode instanceof VariableAssignmentASTNode) {
+				varASTNode = (VariableAssignmentASTNode) currentNode;
+				preparedPart.add(varASTNode.getExpr());
+			}
+			preparedPart.add(currentNode);
+		}
+		for (int i = 0; i < preparedPart.size(); i++) {
+			currentNode = preparedPart.get(i);
 			if (currentNode instanceof IfASTNode) {
 				ControlFlowGraph.processIf(cfg, (IfASTNode) currentNode, level, ids, functionCalls);
 			} else

@@ -9,6 +9,10 @@ public class VariableAssignmentASTNode extends ASTNode {
 		this.expr = expr;
 	}
 
+	public ASTNode getExpr() {
+		return this.expr;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "VariableAssignmentASTNode");
