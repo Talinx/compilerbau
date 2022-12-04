@@ -13,6 +13,18 @@ public class IfASTNode extends ASTNode {
 		this.elsePart = elsePart;
 	}
 
+	public BodyASTNode getBody() {
+		return this.body;
+	}
+
+	public List<ElifASTNode> getElifs() {
+		return this.elifs;
+	}
+
+	public ElseASTNode getElse() {
+		return this.elsePart;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "IfASTNode");

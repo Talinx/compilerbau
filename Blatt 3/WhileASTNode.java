@@ -7,6 +7,10 @@ public class WhileASTNode extends ASTNode {
 		this.body = body;
 	}
 
+	public BodyASTNode getBody() {
+		return this.body;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "WhileASTNode");

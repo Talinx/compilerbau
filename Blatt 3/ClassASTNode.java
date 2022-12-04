@@ -13,6 +13,14 @@ public class ClassASTNode extends ASTNode {
 		this.functions = functions;
 	}
 
+	public List<FunctionDefinitionASTNode> getFunctionDefinitons() {
+		return this.functions;
+	}
+
+	public IDASTNode getId() {
+		return this.name;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "Class " + this.name.id.getText());

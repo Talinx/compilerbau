@@ -7,6 +7,10 @@ public class AST extends ASTNode {
 		this.content = content;
 	}
 
+	public List<ASTNode> getContent() {
+		return this.content;
+	}
+
 	@Override
 	public void print(int level) {
 		for (ASTNode astNode : content) {

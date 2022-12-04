@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.ArrayList;
 
 public class FunctionContentASTNode extends ASTNode {
 	List<ASTNode> statements;
@@ -7,6 +8,17 @@ public class FunctionContentASTNode extends ASTNode {
 	public FunctionContentASTNode(List<ASTNode> statements, ASTNode returnExpr) {
 		this.statements = statements;
 		this.returnExpr = returnExpr;
+	}
+
+	public List<ASTNode> getBody() {
+		List<ASTNode> output = new ArrayList<ASTNode>();
+		for (int i = 0; i < this.statements.size(); i++) {
+			output.add(this.statements.get(i));
+		}
+		if (this.returnExpr != null) {
+			output.add(returnExpr);
+		}
+		return output;
 	}
 
 	@Override

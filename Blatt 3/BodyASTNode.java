@@ -7,6 +7,10 @@ public class BodyASTNode extends ASTNode {
 		this.statements = statements;
 	}
 
+	public List<ASTNode> getContent() {
+		return this.statements;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "BodyASTNode");

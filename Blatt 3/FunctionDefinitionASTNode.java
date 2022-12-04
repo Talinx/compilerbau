@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class FunctionDefinitionASTNode extends ASTNode {
 	IDASTNode id;
 	ParametersASTNode parameters;
@@ -7,6 +9,14 @@ public class FunctionDefinitionASTNode extends ASTNode {
 		this.id = id;
 		this.parameters = parameters;
 		this.content = content;
+	}
+
+	public IDASTNode getId() {
+		return this.id;
+	}
+
+	public List<ASTNode> getBody() {
+		return this.content.getBody();
 	}
 
 	@Override

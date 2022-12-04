@@ -1,6 +1,7 @@
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -35,6 +36,8 @@ class MiniPythonInterpreter {
 			ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
 			var symbolTable = new SymbolTable(scopeListener.getScope());
 			symbolTable.print();
+			ControlFlowGraph<List<ASTNode>> cfg = ControlFlowGraph.constructWithASTNodes(ast);
+			cfg.print();
 		} catch (RecognitionException e) {
 			System.out.println("Something went wrong.");
 			System.exit(1);

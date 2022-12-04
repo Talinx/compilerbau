@@ -7,6 +7,10 @@ public class FunctionCallASTNode extends ASTNode {
 		this.arguments = arguments;
 	}
 
+	public IDASTNode getId() {
+		return this.functionId;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.print(baseIndentation(level) + "FunctionCall: " + functionId.id.getText());

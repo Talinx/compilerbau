@@ -14,6 +14,22 @@ public class IDASTNode extends ASTNode {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof IDASTNode) {
+			IDASTNode otherId = (IDASTNode) obj;
+			if (otherId.id.getText().equals(this.id.getText())) {
+				if (otherId.classId == null) {
+					return this.classId == null;
+				} else {
+					return otherId.classId.getText().equals(this.classId.getText());
+				}
+			}
+			return false;
+		}
+		return false;
+	}
+
+	@Override
 	public void print(int level) {
 		System.out.println(id.getText());
 	}
