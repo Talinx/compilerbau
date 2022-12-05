@@ -15,11 +15,18 @@ class B(A):
 #end
 
 def b(c):
+    1
+    2
     if c > 3:
+        1
+        ...
+        2
         print("Hello")
     else:
+        pass
         print("c is to large")
     #end
+    3
     return "hi"
 #end
 
