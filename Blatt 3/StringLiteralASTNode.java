@@ -9,4 +9,9 @@ public class StringLiteralASTNode extends LiteralASTNode {
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "String: " + content);
 	}
+
+	@Override
+	public String toString() {
+    	return content + " (" + super.toString() + ")";
+    }
 }

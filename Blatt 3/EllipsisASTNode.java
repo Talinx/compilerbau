@@ -6,4 +6,9 @@ public class EllipsisASTNode extends ASTNode {
         
     }
 
+    @Override
+    public String toString() {
+        return "... (" + super.toString() + ")";
+    }
+
 }

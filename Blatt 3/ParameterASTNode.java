@@ -5,6 +5,10 @@ public class ParameterASTNode extends ASTNode {
 		this.id = id;
 	}
 
+	public IDASTNode getId() {
+		return this.id;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.print(baseIndentation(level));

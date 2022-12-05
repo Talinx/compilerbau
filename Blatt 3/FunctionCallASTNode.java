@@ -18,5 +18,8 @@ public class FunctionCallASTNode extends ASTNode {
 		arguments.print(level+1);
 	}
 
-	
+	@Override
+	public String toString() {
+		return functionId.getText() + "() (" + super.toString() + ")";
+	}
 }

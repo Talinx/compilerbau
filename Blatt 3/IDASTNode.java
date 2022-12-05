@@ -33,4 +33,19 @@ public class IDASTNode extends ASTNode {
 	public void print(int level) {
 		System.out.println(id.getText());
 	}
+
+    public String getText() {
+    	if (classId == null) {
+        	return id.getText();
+    	}
+    	return classId.getText() + "." + id.getText();
+    }
+
+	@Override
+    public String toString() {
+    	if (classId == null) {
+        	return id.getText() + " (" + super.toString() + ")";
+    	}
+    	return classId.getText() + "." + id.getText() + " (" + super.toString() + ")";
+    }
 }

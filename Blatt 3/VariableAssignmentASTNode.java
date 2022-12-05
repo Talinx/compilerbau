@@ -22,4 +22,9 @@ public class VariableAssignmentASTNode extends ASTNode {
 		System.out.println(baseIndentation(level+1) + "Value: ");
 		expr.print(level+2);
 	}
+
+	@Override
+	public String toString() {
+    	return id.toString() + " = " + expr.toString() + " (" + super.toString() + ")";
+    }
 }

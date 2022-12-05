@@ -9,4 +9,9 @@ public class BooleanLiteralASTNode extends LiteralASTNode {
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "Boolean: " + this.content);
 	}
+
+	@Override
+	public String toString() {
+    	return content + " (" + super.toString() + ")";
+    }
 }

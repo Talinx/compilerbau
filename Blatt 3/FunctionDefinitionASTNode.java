@@ -28,4 +28,15 @@ public class FunctionDefinitionASTNode extends ASTNode {
 		content.print(level+1);
 	}
 
+	@Override
+	public String toString() {
+		String parameterPart = "";
+		if (parameters.getParameters().size() > 0) {
+			parameterPart = parameters.getParameters().get(0).getId().getText();
+			for (int i = 1; i < parameters.getParameters().size(); i++) {
+				parameterPart += ", " + parameters.getParameters().get(i).getId().getText();
+			}
+		}
+    	return id.getText() + "(" + parameterPart + ")" + " (" + super.toString() + ")";
+    }
 }

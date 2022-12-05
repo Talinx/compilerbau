@@ -7,6 +7,10 @@ public class ParametersASTNode extends ASTNode {
 		this.parameters = parameters;
 	}
 
+	public List<ParameterASTNode> getParameters() {
+		return this.parameters;
+	}
+
 	@Override
 	public void print(int level) {
 		for (var parameter : parameters) {
