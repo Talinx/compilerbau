@@ -49,15 +49,20 @@ public class ControlFlowGraph<T> {
 			if (currentNode instanceof IfASTNode) {
 				nextLevel = new ArrayList<ASTNode>();
 				ControlFlowGraph.processIf(cfg, (IfASTNode) currentNode, level, nextLevel, ids, functionCalls);
+				cfg.addVertice(level);
 				level = nextLevel;
 			} else
 			if (currentNode instanceof WhileASTNode) {
 				nextLevel = new ArrayList<ASTNode>();
 				ControlFlowGraph.processWhile(cfg, (WhileASTNode) currentNode, level, nextLevel, ids, functionCalls);
+				cfg.addVertice(level);
 				level = nextLevel;
 			} else
 			if (currentNode instanceof FunctionCallASTNode) {
-				functionCalls.push(ControlFlowGraph.processFunctionCall(cfg, (FunctionCallASTNode) currentNode, level, ids, functionCalls));
+				nextLevel = new ArrayList<ASTNode>();
+				functionCalls.push(ControlFlowGraph.processFunctionCall(cfg, (FunctionCallASTNode) currentNode, level, nextLevel, ids, functionCalls));
+				cfg.addVertice(level);
+				level = nextLevel;
 			} else {
 				level.add(currentNode);
 			}
@@ -103,8 +108,8 @@ public class ControlFlowGraph<T> {
 		cfg.addEdge(new ControlFlowGraphEdge<List<ASTNode>>(whileLevel, nextLevel));
 	}
 
-	private static CallMetaInfo processFunctionCall(ControlFlowGraph<List<ASTNode>> cfg, FunctionCallASTNode functionCallNode, List<ASTNode> parentLevel, List<CallMetaInfo> ids, Stack<CallMetaInfo> functionCalls) {
-		return new CallMetaInfo(functionCallNode.getId(), parentLevel);
+	private static CallMetaInfo processFunctionCall(ControlFlowGraph<List<ASTNode>> cfg, FunctionCallASTNode functionCallNode, List<ASTNode> parentLevel, List<ASTNode> nextLevel, List<CallMetaInfo> ids, Stack<CallMetaInfo> functionCalls) {
+		return new CallMetaInfo(functionCallNode.getId(), parentLevel, nextLevel);
 	}
 
 	private static void processFunctionDefinition(ControlFlowGraph<List<ASTNode>> cfg, FunctionDefinitionASTNode functionDefNode, List<ASTNode> parentLevel, List<CallMetaInfo> ids, Stack<CallMetaInfo> functionCalls) {
@@ -142,6 +147,7 @@ public class ControlFlowGraph<T> {
 			}
 			if (toLevel != null) {
 				output.addEdge(new ControlFlowGraphEdge<List<ASTNode>>(currentFunctionCall.from, toLevel));
+				output.addEdge(new ControlFlowGraphEdge<List<ASTNode>>(toLevel, currentFunctionCall.nextLevel));
 			} else {
 				System.err.print("Skipping function call, vertice not found: ");
 				currentFunctionCall.id.print(0);
