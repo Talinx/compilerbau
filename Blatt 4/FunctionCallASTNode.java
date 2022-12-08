@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class FunctionCallASTNode extends ASTNode {
 	IDASTNode functionId;
 	ArgumentsASTNode arguments;
@@ -9,6 +11,10 @@ public class FunctionCallASTNode extends ASTNode {
 
 	public IDASTNode getId() {
 		return this.functionId;
+	}
+
+	public List<ASTNode> getArguments() {
+		return this.arguments.getArguments();
 	}
 
 	@Override

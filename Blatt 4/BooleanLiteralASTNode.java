@@ -5,6 +5,10 @@ public class BooleanLiteralASTNode extends LiteralASTNode {
 		this.content = value;
 	}
 
+	public boolean getContent() {
+		return this.content;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "Boolean: " + this.content);

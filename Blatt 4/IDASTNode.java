@@ -29,6 +29,10 @@ public class IDASTNode extends ASTNode {
 		return false;
 	}
 
+	public boolean belongsToClass() {
+		return this.classId != null;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(id.getText());
@@ -39,6 +43,17 @@ public class IDASTNode extends ASTNode {
         	return id.getText();
     	}
     	return classId.getText() + "." + id.getText();
+    }
+
+    public String getTextClass() {
+    	if (classId == null) {
+    		return null;
+    	}
+    	return classId.getText();
+    }
+
+    public String getTextId() {
+    	return id.getText();
     }
 
 	@Override

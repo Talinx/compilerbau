@@ -9,6 +9,10 @@ public class VariableAssignmentASTNode extends ASTNode {
 		this.expr = expr;
 	}
 
+	public IDASTNode getId() {
+		return this.id;
+	}
+
 	public ASTNode getExpr() {
 		return this.expr;
 	}

@@ -38,6 +38,9 @@ class MiniPythonInterpreter {
 			symbolTable.print();
 			ControlFlowGraph<List<ASTNode>> cfg = ControlFlowGraph.constructWithASTNodes(ast);
 			cfg.print();
+			var interpreter = new ASTInterpreter(ast, scopeListener.getScope());
+			System.out.println("Program output:");
+			interpreter.interpret();
 		} catch (RecognitionException e) {
 			System.out.println("Something went wrong.");
 			System.exit(1);

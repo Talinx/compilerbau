@@ -23,6 +23,10 @@ public class Symbol {
 		return this.type;
 	}
 
+	public Scope getScope() {
+		return this.scope;
+	}
+
 	public void setScope(Scope scope) {
 		this.scope = scope;
 	}

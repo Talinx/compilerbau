@@ -5,6 +5,10 @@ public class StringLiteralASTNode extends LiteralASTNode {
 		this.content = text;
 	}
 
+	public String getContent() {
+		return this.content;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "String: " + content);

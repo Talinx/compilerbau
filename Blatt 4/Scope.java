@@ -4,11 +4,13 @@ import java.util.HashMap;
 public class Scope {
 	Scope enclosingScope;
 	Map<String, Symbol> symbols;
+	Map<String, InterpreterContext> contexts;
 	Map<String, Scope> innerScopes;
 
 	public Scope() {
 		this.enclosingScope = null;
 		this.symbols = new HashMap<String, Symbol>();
+		this.contexts = new HashMap<String, InterpreterContext>();
 		this.innerScopes = new HashMap<String, Scope>();
 	}
 
@@ -33,6 +35,29 @@ public class Scope {
 		}
 		if (enclosingScope != null) {
 			return enclosingScope.resolve(id);
+		}
+		return null;
+	}
+
+	public boolean setValue(String id, InterpreterContext value) {
+		var symbolFromThisScope = symbols.get(id);
+		if (symbolFromThisScope != null) {
+			contexts.put(id, value);
+			return true;
+		}
+		if (enclosingScope != null) {
+			return enclosingScope.setValue(id, value);
+		}
+		return false;
+	}
+
+	public InterpreterContext getValue(String id) {
+		var valueFromThisScope = contexts.get(id);
+		if (valueFromThisScope != null) {
+			return valueFromThisScope;
+		}
+		if (enclosingScope != null) {
+			return enclosingScope.getValue(id);
 		}
 		return null;
 	}

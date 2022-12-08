@@ -7,6 +7,10 @@ public class ArgumentsASTNode extends ASTNode {
 		this.arguments = arguments;
 	}
 
+	public List<ASTNode> getArguments() {
+		return this.arguments;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "ArgumentsASTNode");
