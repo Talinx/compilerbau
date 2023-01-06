@@ -15,6 +15,7 @@ class B(A):
 #end
 
 def b(c):
+    print("Hi from b")
     1
     2
     if c > 3:
