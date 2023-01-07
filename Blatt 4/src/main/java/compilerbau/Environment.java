@@ -6,7 +6,9 @@ public class Environment {
     Environment enclosingEnv;
     Map<String, InterpreterContext> values;
 
-    public Environment() { }
+    public Environment(Environment enclosingEnv) {
+        this.enclosingEnv = enclosingEnv;
+    }
 
     public void setValue(String id, InterpreterContext value) {
 		var symbolFromThisScope = values.get(id);
