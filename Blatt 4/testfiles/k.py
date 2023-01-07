@@ -31,3 +31,4 @@ def b(c):
 #end
 
 a = b()
+print(a)
