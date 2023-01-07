@@ -4,6 +4,8 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -18,8 +20,7 @@ class MiniPythonInterpreter {
 			System.out.println(args[i]);
 		}
 		if (args.length < 1) {
-			System.out.println("No input file specified.");
-			System.exit(1);
+			runInteractiveInterperter();
 		}
 		CharStream inputStream = null;
 		try {
@@ -50,4 +51,46 @@ class MiniPythonInterpreter {
 			System.exit(1);
 		}
 	}
+
+    private static void runInteractiveInterperter() {
+        var interpreter = new ASTInterpreter();
+        var scanner = new Scanner(System.in);
+        boolean isInMultiLine = false;
+        String tempStorage = null;
+        while(true) {
+            if (!isInMultiLine) {
+                System.out.print(">>> ");
+                var input = scanner.nextLine();
+                if (input.startsWith("def") || 
+                    input.startsWith("class") ||
+                    input.startsWith("if") || 
+                    input.startsWith("while")) {
+                    isInMultiLine = true;
+                    tempStorage = input;
+                }
+            }
+            else {
+                System.out.print("... ");
+                var input = scanner.nextLine();
+                if (input.isBlank()){
+                    var inputStream = CharStreams.fromString(tempStorage);
+                    var lexer = new MiniPythonLexer(inputStream);
+                    var tokenStream = new CommonTokenStream(lexer);
+                    var parser = new MiniPythonParser(tokenStream);
+                    var cst = parser.startfile();
+                    var astVisitor = new ASTVisitor();
+                    var ast = (AST) astVisitor.visitStartfile(cst);
+                    var scopeListener = new ScopeListener();
+                    ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
+                    var symbolTable = new SymbolTable(scopeListener.getScope());
+                    interpreter.interpretInteractive(); //TODO: add params
+                    isInMultiLine = false;
+                    tempStorage = null;
+                }
+                else {
+                    tempStorage = tempStorage + "\n" + input;
+                }
+            }
+        }
+    }
 }

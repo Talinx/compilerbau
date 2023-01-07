@@ -1,6 +1,11 @@
 package compilerbau;
 
 import java.util.List;
+
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
 import java.util.ArrayList;
 import compilerbau.ASTNodes.ASTNode;
 import compilerbau.ASTNodes.BooleanLiteralASTNode;
@@ -15,6 +20,14 @@ class ASTInterpreter {
 	AST ast;
 	Scope topLevel, currentScope;
 
+    List<AST> interactiveASTs;
+    Scope interactiveScope;
+
+    public ASTInterpreter() {
+        this.interactiveASTs = new ArrayList<>();
+        this.interactiveScope = new BuiltinIdsScope();
+    }
+
 	public ASTInterpreter(AST ast, Scope scope) {
 		this.ast = ast;
 		this.topLevel = scope;
@@ -23,6 +36,25 @@ class ASTInterpreter {
 	
 	public void interpret() {
 		List<ASTNode> nodes = this.ast.getContent();
+		for (int i = 0; i < nodes.size(); i++) {
+			this.currentScope = this.topLevel;
+			this.interpretASTNode(nodes.get(i));
+		}
+	}
+
+    public void interpretInteractive(String input) {
+        var inputStream = CharStreams.fromString(input);
+        var lexer = new MiniPythonLexer(inputStream);
+        var tokenStream = new CommonTokenStream(lexer);
+        var parser = new MiniPythonParser(tokenStream);
+        var cst = parser.startfile();
+        var astVisitor = new ASTVisitor();
+        var ast = (AST) astVisitor.visitStartfile(cst);
+        var scopeListener = new ScopeListener();
+        ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
+        var symbolTable = new SymbolTable(scopeListener.getScope());
+
+		List<ASTNode> nodes = ast.getContent();
 		for (int i = 0; i < nodes.size(); i++) {
 			this.currentScope = this.topLevel;
 			this.interpretASTNode(nodes.get(i));

@@ -22,8 +22,7 @@
             "name": "Launch MiniPythonInterpreter",
             "request": "launch",
             "mainClass": "compilerbau.MiniPythonInterpreter",
-            "projectName": "b4",
-            "args": "testfiles/i.py"
+            "projectName": "b4"
         }
     ]
 }
