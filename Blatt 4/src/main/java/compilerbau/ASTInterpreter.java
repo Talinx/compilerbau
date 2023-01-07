@@ -15,10 +15,14 @@ import compilerbau.ASTNodes.IntLiteralASTNode;
 import compilerbau.ASTNodes.PlusASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
 import compilerbau.ASTNodes.VariableAssignmentASTNode;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Objects;
 
 class ASTInterpreter {
 	AST ast;
 	Scope topLevel, currentScope;
+	Map<Symbol, ASTNode> links;
 
     List<AST> interactiveASTs;
     Evironment interactiveScope;
@@ -32,9 +36,11 @@ class ASTInterpreter {
 		this.ast = ast;
 		this.topLevel = scope;
 		this.currentScope = scope;
+		this.links = new HashMap<>();
 	}
 	
 	public void interpret() {
+		this.constructLinks(this.ast, this.topLevel);
 		List<ASTNode> nodes = this.ast.getContent();
 		for (int i = 0; i < nodes.size(); i++) {
 			this.currentScope = this.topLevel;
@@ -59,6 +65,32 @@ class ASTInterpreter {
 			this.currentScope = this.topLevel;
 			this.interpretASTNode(nodes.get(i));
 		}
+    }
+    
+	private void constructLinks(ASTNode node, Scope currentScope) {
+		Symbol symbol;
+		AST ast;
+		FunctionDefinitionASTNode functionDefinitionASTNode;
+		if (node instanceof AST) {
+			ast = (AST) node;
+			for (ASTNode n : ast.getContent()) {
+				this.constructLinks(n, currentScope);
+			}
+		} else
+		if (node instanceof FunctionDefinitionASTNode) {
+			functionDefinitionASTNode = (FunctionDefinitionASTNode) node;
+			symbol = currentScope.resolve(functionDefinitionASTNode.getId().getText());
+			links.put(symbol, functionDefinitionASTNode);
+		}
+	}
+
+	private InterpreterContext interpretASTNode(FunctionDefinitionASTNode node, List<InterpreterContext> contexts) {
+		List<ASTNode> body = node.getBody();
+		InterpreterContext output = null;
+		for (int i = 0; i < body.size(); i++) {
+			output = interpretASTNode(body.get(i));
+		}
+		return output;
 	}
 
 	private InterpreterContext interpretASTNode(ASTNode node) {
@@ -71,6 +103,8 @@ class ASTInterpreter {
 		InterpreterContext context, left, right;
 		Scope stackScope; // for saving the current scope on the stack of this function call
 		ClassScope currentClassScope;
+		ASTNode tempNode;
+		FunctionDefinitionASTNode functionDefinitionASTNode;
 		if (node instanceof IntLiteralASTNode) {
 			return InterpreterContext.from((IntLiteralASTNode) node);
 		} else
@@ -122,10 +156,23 @@ class ASTInterpreter {
 					}
 					return new InterpreterContext(ExprEvalType.NONE);
 				default:
-					System.err.println("Not a built-in function: " + functionCallASTNode.getId().getText());
+					tempNode = links.get(symbol);
+					if (tempNode == null || !(tempNode instanceof FunctionDefinitionASTNode)) {
+						System.err.println("Not a built-in function: " + functionCallASTNode.getId().getText());
+					} else {
+						System.out.println("Function call for: " + functionCallASTNode.getId().getText());
+						return interpretASTNode((FunctionDefinitionASTNode) tempNode, contexts);
+					}
 				}
 			} else {
 				// handle function call
+				tempNode = links.get(symbol);
+				if (tempNode == null || !(tempNode instanceof FunctionDefinitionASTNode)) {
+					System.err.println("Function not found: " + functionCallASTNode.getId().getText());
+				} else {
+					System.out.println("Function call for: " + functionCallASTNode.getId().getText());
+					return interpretASTNode((FunctionDefinitionASTNode) tempNode, contexts);
+				}
 			}
 		} else
 		if (node instanceof VariableAssignmentASTNode) {
