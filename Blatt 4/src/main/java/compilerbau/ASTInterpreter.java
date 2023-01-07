@@ -21,7 +21,7 @@ class ASTInterpreter {
 	Scope topLevel, currentScope;
 
     List<AST> interactiveASTs;
-    Scope interactiveScope;
+    Evironment interactiveScope;
 
     public ASTInterpreter() {
         this.interactiveASTs = new ArrayList<>();
