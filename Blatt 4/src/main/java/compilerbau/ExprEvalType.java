@@ -4,5 +4,7 @@ enum ExprEvalType {
 	NONE,
 	INTEGER,
 	STRING,
-	BOOLEAN
+	BOOLEAN,
+    FUNCASTNODE,
+    BUILTINFUNC
 }

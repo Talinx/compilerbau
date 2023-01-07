@@ -25,11 +25,11 @@ class ASTInterpreter {
 	Map<Symbol, ASTNode> links;
 
     List<AST> interactiveASTs;
-    Evironment interactiveScope;
+    Evironment interactiveEnvironment;
 
     public ASTInterpreter() {
         this.interactiveASTs = new ArrayList<>();
-        this.interactiveScope = new BuiltinIdsScope();
+        this.interactiveEnvironment = new BuiltinIdsScope();
     }
 
 	public ASTInterpreter(AST ast, Scope scope) {
@@ -66,7 +66,7 @@ class ASTInterpreter {
 			this.interpretASTNode(nodes.get(i));
 		}
     }
-    
+
 	private void constructLinks(ASTNode node, Scope currentScope) {
 		Symbol symbol;
 		AST ast;
