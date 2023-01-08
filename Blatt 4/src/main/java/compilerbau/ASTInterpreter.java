@@ -30,7 +30,7 @@ class ASTInterpreter {
 
     public ASTInterpreter() {
         this.interactiveASTs = new ArrayList<>();
-        this.interactiveEnvironment = new BuiltinIdsScope();
+        this.interactiveEnvironment = new BuiltinEnvironment();
     }
 
 	public ASTInterpreter(AST ast, Scope scope) {

@@ -83,7 +83,7 @@ class MiniPythonInterpreter {
                     var scopeListener = new ScopeListener();
                     ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
                     var symbolTable = new SymbolTable(scopeListener.getScope());
-                    interpreter.interpretInteractive(); //TODO: add params
+                    //interpreter.interpretInteractive(); //TODO: add params
                     isInMultiLine = false;
                     tempStorage = null;
                 }

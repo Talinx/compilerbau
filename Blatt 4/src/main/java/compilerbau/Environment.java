@@ -1,13 +1,20 @@
 package compilerbau;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Environment {
     Environment enclosingEnv;
     Map<String, InterpreterContext> values;
 
+    public Environment() {
+		this.enclosingEnv = null;
+        this.values = new HashMap<String, InterpreterContext>();
+	}
+
     public Environment(Environment enclosingEnv) {
         this.enclosingEnv = enclosingEnv;
+        this.values = new HashMap<String, InterpreterContext>();
     }
 
     public void setValue(String id, InterpreterContext value) {

@@ -1,12 +1,36 @@
 *.class
-MiniPython.interp
-MiniPython.tokens
-MiniPythonBaseListener.java
-MiniPythonBaseVisitor.java
-MiniPythonLexer.java
-MiniPythonLexer.interp
-MiniPythonLexer.tokens
-MiniPythonListener.java
-MiniPythonParser.java
-MiniPythonVisitor.java
 lib/
+target/
+
+Blatt 2/*/MiniPython.interp
+Blatt 2/*/MiniPython.tokens
+Blatt 2/*/MiniPythonBaseListener.java
+Blatt 2/*/MiniPythonBaseVisitor.java
+Blatt 2/*/MiniPythonLexer.java
+Blatt 2/*/MiniPythonLexer.interp
+Blatt 2/*/MiniPythonLexer.tokens
+Blatt 2/*/MiniPythonListener.java
+Blatt 2/*/MiniPythonParser.java
+Blatt 2/*/MiniPythonVisitor.java
+
+Blatt 2/MiniPython.interp
+Blatt 2/MiniPython.tokens
+Blatt 2/MiniPythonBaseListener.java
+Blatt 2/MiniPythonBaseVisitor.java
+Blatt 2/MiniPythonLexer.java
+Blatt 2/MiniPythonLexer.interp
+Blatt 2/MiniPythonLexer.tokens
+Blatt 2/MiniPythonListener.java
+Blatt 2/MiniPythonParser.java
+Blatt 2/MiniPythonVisitor.java
+
+Blatt 3/MiniPython.interp
+Blatt 3/MiniPython.tokens
+Blatt 3/MiniPythonBaseListener.java
+Blatt 3/MiniPythonBaseVisitor.java
+Blatt 3/MiniPythonLexer.java
+Blatt 3/MiniPythonLexer.interp
+Blatt 3/MiniPythonLexer.tokens
+Blatt 3/MiniPythonListener.java
+Blatt 3/MiniPythonParser.java
+Blatt 3/MiniPythonVisitor.java
