@@ -1,23 +1,24 @@
 package compilerbau;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.ArrayList;
 import compilerbau.ASTNodes.ASTNode;
 import compilerbau.ASTNodes.BooleanLiteralASTNode;
 import compilerbau.ASTNodes.FunctionCallASTNode;
+import compilerbau.ASTNodes.FunctionDefinitionASTNode;
 import compilerbau.ASTNodes.IDASTNode;
 import compilerbau.ASTNodes.IntLiteralASTNode;
 import compilerbau.ASTNodes.PlusASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
 import compilerbau.ASTNodes.VariableAssignmentASTNode;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Objects;
+import compilerbau.Environment;
 
 class ASTInterpreter {
 	AST ast;
@@ -25,7 +26,7 @@ class ASTInterpreter {
 	Map<Symbol, ASTNode> links;
 
     List<AST> interactiveASTs;
-    Evironment interactiveEnvironment;
+    Environment interactiveEnvironment;
 
     public ASTInterpreter() {
         this.interactiveASTs = new ArrayList<>();
