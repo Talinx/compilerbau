@@ -8,6 +8,10 @@ public class ElifASTNode extends ASTNode {
 		this.body = body;
 	}
 
+	public ASTNode getCondition() {
+		return this.condition;
+	}
+
 	public BodyASTNode getBody() {
 		return this.body;
 	}

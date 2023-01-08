@@ -14,6 +14,10 @@ public class IfASTNode extends ASTNode {
 		this.elsePart = elsePart;
 	}
 
+	public ASTNode getCondition() {
+		return this.condition;
+	}
+
 	public BodyASTNode getBody() {
 		return this.body;
 	}

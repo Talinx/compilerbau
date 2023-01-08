@@ -28,6 +28,9 @@ import compilerbau.ASTNodes.GreaterASTNode;
 import compilerbau.ASTNodes.GreaterEqualsASTNode;
 import compilerbau.ASTNodes.AndASTNode;
 import compilerbau.ASTNodes.OrASTNode;
+import compilerbau.ASTNodes.IfASTNode;
+import compilerbau.ASTNodes.ElifASTNode;
+import compilerbau.ASTNodes.WhileASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
 import compilerbau.ASTNodes.VariableAssignmentASTNode;
 import compilerbau.Environment;
@@ -120,9 +123,11 @@ class ASTInterpreter {
 		GreaterEqualsASTNode greaterEqualsASTNode;
 		AndASTNode andASTNode;
 		OrASTNode orASTNode;
+		IfASTNode ifASTNode;
+		WhileASTNode whileASTNode;
 		IDASTNode idASTNode;
 		List<ASTNode> astNodes;
-		InterpreterContext context, left, right;
+		InterpreterContext context, left, right, condition;
 		Scope stackScope; // for saving the current scope on the stack of this function call
 		ClassScope currentClassScope;
 		ASTNode tempNode;
@@ -491,7 +496,7 @@ class ASTInterpreter {
 				return right;
 			}
 			return left;
-		}
+		} else
 		if (node instanceof OrASTNode) {
 			orASTNode = (OrASTNode) node;
 			left = this.interpretASTNode(orASTNode.getLeft());
@@ -500,7 +505,36 @@ class ASTInterpreter {
 			}
 			right = this.interpretASTNode(orASTNode.getRight());
 			return right;
-		}
+		} else
+		if (node instanceof IfASTNode) {
+			ifASTNode = (IfASTNode) node;
+			condition = this.interpretASTNode(ifASTNode.getCondition());
+			if (condition.isTruthy()) {
+				return this.interpretASTNode(ifASTNode.getBody());
+			}
+			var elifs = ifASTNode.getElifs();
+			for (int i = 0; i < elifs.size(); i++) {
+				ElifASTNode cNode = elifs.get(i);
+				condition = this.interpretASTNode(cNode.getCondition());
+				if (condition.isTruthy()) {
+					return this.interpretASTNode(cNode.getBody());
+				}
+			}
+			var elseNode = ifASTNode.getElse();
+			if (elseNode != null) {
+				return this.interpretASTNode(elseNode.getBody());
+			}
+			return new InterpreterContext(ExprEvalType.NONE);
+		} else
+		if (node instanceof WhileASTNode) {
+			whileASTNode = (WhileASTNode) node;
+			condition = this.interpretASTNode(whileASTNode.getCondition());
+			while (condition.isTruthy()) {
+				this.interpretASTNode(whileASTNode.getBody());
+				condition = this.interpretASTNode(whileASTNode.getCondition());
+			}
+			return new InterpreterContext(ExprEvalType.NONE);
+		} else
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
 			stackScope = this.currentScope;
@@ -519,7 +553,7 @@ class ASTInterpreter {
     private InterpreterContext interpretASTNodeInteractive(ASTNode node) {
 		FunctionCallASTNode functionCallASTNode;
 		VariableAssignmentASTNode variableAssignmentASTNode;
-		InterpreterContext left, right;
+		InterpreterContext left, right, condition;
 		PlusASTNode plusASTNode;
 		MinusASTNode minusASTNode;
 		MulASTNode mulASTNode;
@@ -533,6 +567,8 @@ class ASTInterpreter {
 		AndASTNode andASTNode;
 		OrASTNode orASTNode;
 		IDASTNode idASTNode;
+		IfASTNode ifASTNode;
+		WhileASTNode whileASTNode;
 		InterpreterContext context;
 		if (node instanceof IntLiteralASTNode) {
 			return InterpreterContext.from((IntLiteralASTNode) node);
@@ -904,7 +940,7 @@ class ASTInterpreter {
 				return right;
 			}
 			return left;
-		}
+		} else
 		if (node instanceof OrASTNode) {
 			orASTNode = (OrASTNode) node;
 			left = this.interpretASTNode(orASTNode.getLeft());
@@ -913,7 +949,36 @@ class ASTInterpreter {
 			}
 			right = this.interpretASTNode(orASTNode.getRight());
 			return right;
-		}
+		} else
+		if (node instanceof IfASTNode) {
+			ifASTNode = (IfASTNode) node;
+			condition = this.interpretASTNode(ifASTNode.getCondition());
+			if (condition.isTruthy()) {
+				return this.interpretASTNode(ifASTNode.getBody());
+			}
+			var elifs = ifASTNode.getElifs();
+			for (int i = 0; i < elifs.size(); i++) {
+				ElifASTNode cNode = elifs.get(i);
+				condition = this.interpretASTNode(cNode.getCondition());
+				if (condition.isTruthy()) {
+					return this.interpretASTNode(cNode.getBody());
+				}
+			}
+			var elseNode = ifASTNode.getElse();
+			if (elseNode != null) {
+				return this.interpretASTNode(elseNode.getBody());
+			}
+			return new InterpreterContext(ExprEvalType.NONE);
+		} else
+		if (node instanceof WhileASTNode) {
+			whileASTNode = (WhileASTNode) node;
+			condition = this.interpretASTNode(whileASTNode.getCondition());
+			while (condition.isTruthy()) {
+				this.interpretASTNode(whileASTNode.getBody());
+				condition = this.interpretASTNode(whileASTNode.getCondition());
+			}
+			return new InterpreterContext(ExprEvalType.NONE);
+		} else
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
 			// if (idASTNode.belongsToClass()) {
