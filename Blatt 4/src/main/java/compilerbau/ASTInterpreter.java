@@ -26,6 +26,8 @@ import compilerbau.ASTNodes.LessASTNode;
 import compilerbau.ASTNodes.LessEqualsASTNode;
 import compilerbau.ASTNodes.GreaterASTNode;
 import compilerbau.ASTNodes.GreaterEqualsASTNode;
+import compilerbau.ASTNodes.AndASTNode;
+import compilerbau.ASTNodes.OrASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
 import compilerbau.ASTNodes.VariableAssignmentASTNode;
 import compilerbau.Environment;
@@ -116,6 +118,8 @@ class ASTInterpreter {
 		LessEqualsASTNode lessEqualsASTNode;
 		GreaterASTNode greaterASTNode;
 		GreaterEqualsASTNode greaterEqualsASTNode;
+		AndASTNode andASTNode;
+		OrASTNode orASTNode;
 		IDASTNode idASTNode;
 		List<ASTNode> astNodes;
 		InterpreterContext context, left, right;
@@ -479,6 +483,24 @@ class ASTInterpreter {
 				System.err.println("Greater equals operands have different types.");
 			}
 		} else
+		if (node instanceof AndASTNode) {
+			andASTNode = (AndASTNode) node;
+			left = this.interpretASTNode(andASTNode.getLeft());
+			if (left.isTruthy()) {
+				right = this.interpretASTNode(andASTNode.getRight());
+				return right;
+			}
+			return left;
+		}
+		if (node instanceof OrASTNode) {
+			orASTNode = (OrASTNode) node;
+			left = this.interpretASTNode(orASTNode.getLeft());
+			if (left.isTruthy()) {
+				return left;
+			}
+			right = this.interpretASTNode(orASTNode.getRight());
+			return right;
+		}
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
 			stackScope = this.currentScope;
@@ -508,6 +530,8 @@ class ASTInterpreter {
 		LessEqualsASTNode lessEqualsASTNode;
 		GreaterASTNode greaterASTNode;
 		GreaterEqualsASTNode greaterEqualsASTNode;
+		AndASTNode andASTNode;
+		OrASTNode orASTNode;
 		IDASTNode idASTNode;
 		InterpreterContext context;
 		if (node instanceof IntLiteralASTNode) {
@@ -872,6 +896,24 @@ class ASTInterpreter {
 				System.err.println("Greater equals operands have different types.");
 			}
 		} else
+		if (node instanceof AndASTNode) {
+			andASTNode = (AndASTNode) node;
+			left = this.interpretASTNode(andASTNode.getLeft());
+			if (left.isTruthy()) {
+				right = this.interpretASTNode(andASTNode.getRight());
+				return right;
+			}
+			return left;
+		}
+		if (node instanceof OrASTNode) {
+			orASTNode = (OrASTNode) node;
+			left = this.interpretASTNode(orASTNode.getLeft());
+			if (left.isTruthy()) {
+				return left;
+			}
+			right = this.interpretASTNode(orASTNode.getRight());
+			return right;
+		}
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
 			// if (idASTNode.belongsToClass()) {

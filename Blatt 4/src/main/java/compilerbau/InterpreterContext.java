@@ -68,6 +68,19 @@ class InterpreterContext {
 		return this.evalType;
 	}
 
+	public boolean isTruthy() {
+		switch(this.evalType) {
+		case INTEGER:
+			return this.intV != 0;
+		case STRING:
+			return this.strV.length() > 0;
+		case BOOLEAN:
+			return this.booleanV;
+		default:
+			return false;
+		}
+	}
+
 	public static InterpreterContext from(IntLiteralASTNode node) {
 		InterpreterContext context = new InterpreterContext(ExprEvalType.INTEGER);
 		var content = node.getContent();
