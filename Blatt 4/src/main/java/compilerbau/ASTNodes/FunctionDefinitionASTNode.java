@@ -20,6 +20,10 @@ public class FunctionDefinitionASTNode extends ASTNode {
 		return this.content.getBody();
 	}
 
+    public List<ParameterASTNode> getParametersASTNodes() {
+        return this.parameters.getParameters();
+    }
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "FunctionDef: " + id.id.getText());

@@ -53,7 +53,7 @@ class MiniPythonInterpreter {
 	}
 
     private static void runInteractiveInterperter() {
-        var interpreter = new ASTInterpreter();
+        var interpreterBuilder = new ASTInterpreterBuilder();
         var scanner = new Scanner(System.in);
         boolean isInMultiLine = false;
         String tempStorage = null;
@@ -68,22 +68,15 @@ class MiniPythonInterpreter {
                     isInMultiLine = true;
                     tempStorage = input;
                 }
+                else {
+                    interpreterBuilder.getInstance().interpretInteractive(input);
+                }
             }
             else {
                 System.out.print("... ");
                 var input = scanner.nextLine();
                 if (input.isBlank()){
-                    var inputStream = CharStreams.fromString(tempStorage);
-                    var lexer = new MiniPythonLexer(inputStream);
-                    var tokenStream = new CommonTokenStream(lexer);
-                    var parser = new MiniPythonParser(tokenStream);
-                    var cst = parser.startfile();
-                    var astVisitor = new ASTVisitor();
-                    var ast = (AST) astVisitor.visitStartfile(cst);
-                    var scopeListener = new ScopeListener();
-                    ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
-                    var symbolTable = new SymbolTable(scopeListener.getScope());
-                    //interpreter.interpretInteractive(); //TODO: add params
+                    interpreterBuilder.getInstance().interpretInteractive(tempStorage);
                     isInMultiLine = false;
                     tempStorage = null;
                 }

@@ -26,11 +26,13 @@ class ASTInterpreter {
 	Map<Symbol, ASTNode> links;
 
     List<AST> interactiveASTs;
-    Environment interactiveEnvironment;
+    Environment interactiveEnvironment, currentEnvironment;
 
     public ASTInterpreter() {
         this.interactiveASTs = new ArrayList<>();
         this.interactiveEnvironment = new BuiltinEnvironment();
+        this.currentEnvironment = new Environment();
+        this.currentEnvironment = this.interactiveEnvironment;
     }
 
 	public ASTInterpreter(AST ast, Scope scope) {
@@ -57,14 +59,10 @@ class ASTInterpreter {
         var cst = parser.startfile();
         var astVisitor = new ASTVisitor();
         var ast = (AST) astVisitor.visitStartfile(cst);
-        var scopeListener = new ScopeListener();
-        ParseTreeWalker.DEFAULT.walk(scopeListener, cst);
-        var symbolTable = new SymbolTable(scopeListener.getScope());
 
 		List<ASTNode> nodes = ast.getContent();
 		for (int i = 0; i < nodes.size(); i++) {
-			this.currentScope = this.topLevel;
-			this.interpretASTNode(nodes.get(i));
+			this.interpretASTNodeInteractive(nodes.get(i));
 		}
     }
 
@@ -227,6 +225,146 @@ class ASTInterpreter {
 				stackScope = stackScope.resolveClass(idASTNode.getTextClass());
 			}
 			context = stackScope.getValue(idASTNode.getTextId());
+			if (context == null) {
+				return new InterpreterContext(ExprEvalType.NONE);
+			}
+			return context;
+		}
+		return new InterpreterContext(ExprEvalType.NONE);
+	}
+
+    private InterpreterContext interpretASTNodeInteractive(ASTNode node) {
+		FunctionCallASTNode functionCallASTNode;
+		VariableAssignmentASTNode variableAssignmentASTNode;
+		PlusASTNode plusASTNode;
+		IDASTNode idASTNode;
+		InterpreterContext context;
+		if (node instanceof IntLiteralASTNode) {
+			return InterpreterContext.from((IntLiteralASTNode) node);
+		} else
+		if (node instanceof StringLiteralASTNode) {
+			return InterpreterContext.from((StringLiteralASTNode) node);
+		} else
+		if (node instanceof BooleanLiteralASTNode) {
+			return InterpreterContext.from((BooleanLiteralASTNode) node);
+		} else
+		if (node instanceof FunctionCallASTNode) {
+			functionCallASTNode = (FunctionCallASTNode) node;
+			context = currentEnvironment.getValue(functionCallASTNode.getId().getText());
+			if (context == null) {
+				// throw error
+				System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
+			}
+            if (context.getEvalType() == ExprEvalType.BUILTINFUNC) {
+                var paramAstNodes = functionCallASTNode.getArguments();
+                if (paramAstNodes.size() != 1) {
+                    System.err.println("Function " + functionCallASTNode.getId().getText() + " expected " + 
+                                        1 + " Arguments but got " + paramAstNodes.size());
+                    return null;
+                }
+                var value = interpretASTNodeInteractive(paramAstNodes.get(0));
+                switch (value.getEvalType()) {
+                    case INTEGER:
+                        context.JavaConsRefV.accept(Integer.toString(value.getIntValue()));
+                        break;
+                    case STRING:
+                        context.JavaConsRefV.accept(value.getStringValue());
+                        break;
+                    case BOOLEAN:
+                        if (value.getBooleanValue())
+                            context.JavaConsRefV.accept("True");
+                        else
+                            context.JavaConsRefV.accept("False");
+                        break;
+                    default:
+                        break;
+                }
+                return null;
+            }
+			if (!(context.getEvalType() == ExprEvalType.FUNCASTNODE)) {
+				// throw error
+				System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
+			}
+
+			var paramAstNodes = functionCallASTNode.getArguments();
+            var argAstNodes = context.AstRefV.getParametersASTNodes();
+            
+            if (paramAstNodes.size() != argAstNodes.size()) {
+                System.err.println("Function " + functionCallASTNode.getId().getText() + " expected " + 
+                                    argAstNodes.size() + " Arguments but got " + paramAstNodes.size());
+                return null;
+            }
+
+            var paramEnv = new Environment(currentEnvironment);
+            currentEnvironment = paramEnv;
+            
+            for (int i = 0; i < paramAstNodes.size(); i++) {
+                var name = argAstNodes.get(i).getId().id.getText();
+                var value = interpretASTNodeInteractive(paramAstNodes.get(i));
+                if (value == null) {
+                    System.err.println("Argument " + i + " of Function " + functionCallASTNode.getId().getText() + "could not be interpreted");
+                    return null;
+                }
+                paramEnv.setValue(name, value);
+            }
+            
+            var bodyEnv = new Environment(currentEnvironment);
+            currentEnvironment = bodyEnv;
+            
+            for (var bodyNode : context.AstRefV.getBody()) {
+                interpretASTNodeInteractive(bodyNode);
+            }
+
+            var oldBodyEnv = currentEnvironment;
+            currentEnvironment = currentEnvironment.enclosingEnv;
+            oldBodyEnv.enclosingEnv = null;
+
+            var oldParamEnv = currentEnvironment;
+            currentEnvironment = currentEnvironment.enclosingEnv;
+            oldParamEnv.enclosingEnv = null;
+		} else
+		if (node instanceof VariableAssignmentASTNode) {
+			variableAssignmentASTNode = (VariableAssignmentASTNode) node;
+            var name = variableAssignmentASTNode.getId().id.getText();
+			var value = this.interpretASTNode(variableAssignmentASTNode.getExpr());
+            
+            currentEnvironment.setValue(name, value);
+			return null;
+		} else
+		if (node instanceof PlusASTNode) {
+			plusASTNode = (PlusASTNode) node;
+			var left = this.interpretASTNode(plusASTNode.getLeft());
+			var right = this.interpretASTNode(plusASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() + right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue() + right.getStringValue());
+				case BOOLEAN:
+					int trueCount = 0;
+					if (left.getBooleanValue()) {
+						trueCount++;
+					}
+					if (right.getBooleanValue()) {
+						trueCount++;
+					}
+					return new InterpreterContext(trueCount);
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Plus operands have different types.");
+			}
+		} else
+		if (node instanceof IDASTNode) {
+			idASTNode = (IDASTNode) node;
+			// if (idASTNode.belongsToClass()) {
+			// 	stackScope = currentEnvironment.resolveClass(idASTNode.getTextClass());
+			// }
+			context = currentEnvironment.getValue(idASTNode.getTextId());
 			if (context == null) {
 				return new InterpreterContext(ExprEvalType.NONE);
 			}
