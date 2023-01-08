@@ -11,7 +11,6 @@ for f in tempantlr/*.java
 do
 	fb=$(basename $f)
 	echo -e "package compilerbau;\n\n" > $fb
-	echo -e "package compilerbau;\n\n"
 	cat $f >> $fb
 done
 rm -r tempantlr
