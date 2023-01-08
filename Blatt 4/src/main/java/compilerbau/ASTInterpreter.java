@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.lang.StringBuilder;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -16,6 +17,11 @@ import compilerbau.ASTNodes.FunctionDefinitionASTNode;
 import compilerbau.ASTNodes.IDASTNode;
 import compilerbau.ASTNodes.IntLiteralASTNode;
 import compilerbau.ASTNodes.PlusASTNode;
+import compilerbau.ASTNodes.MinusASTNode;
+import compilerbau.ASTNodes.MulASTNode;
+import compilerbau.ASTNodes.DivASTNode;
+import compilerbau.ASTNodes.EqualsASTNode;
+import compilerbau.ASTNodes.NotEqualsASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
 import compilerbau.ASTNodes.VariableAssignmentASTNode;
 import compilerbau.Environment;
@@ -97,6 +103,11 @@ class ASTInterpreter {
 		FunctionCallASTNode functionCallASTNode;
 		VariableAssignmentASTNode variableAssignmentASTNode;
 		PlusASTNode plusASTNode;
+		MinusASTNode minusASTNode;
+		MulASTNode mulASTNode;
+		DivASTNode divASTNode;
+		EqualsASTNode equalsASTNode;
+		NotEqualsASTNode notEqualsASTNode;
 		IDASTNode idASTNode;
 		List<ASTNode> astNodes;
 		InterpreterContext context, left, right;
@@ -218,6 +229,136 @@ class ASTInterpreter {
 				System.err.println("Plus operands have different types.");
 			}
 		} else
+		if (node instanceof MinusASTNode) {
+			minusASTNode = (MinusASTNode) node;
+			left = this.interpretASTNode(minusASTNode.getLeft());
+			right = this.interpretASTNode(minusASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() - right.getIntValue());
+				case BOOLEAN:
+					int minusBooleans = 0;
+					if (left.getBooleanValue()) {
+						minusBooleans++;
+					}
+					if (right.getBooleanValue()) {
+						minusBooleans--;
+					}
+					return new InterpreterContext(minusBooleans);
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Minus operands have different types.");
+			}
+		} else
+		if (node instanceof MulASTNode) {
+			mulASTNode = (MulASTNode) node;
+			left = this.interpretASTNode(mulASTNode.getLeft());
+			right = this.interpretASTNode(mulASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() * right.getIntValue());
+				case BOOLEAN:
+					int mulBooleans = 0;
+					if (left.getBooleanValue() && right.getBooleanValue()) {
+						mulBooleans = 1;
+					}
+					return new InterpreterContext(mulBooleans);
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				if (left.getEvalType() == ExprEvalType.STRING && right.getEvalType() == ExprEvalType.INTEGER) {
+					StringBuilder mulBuilder = new StringBuilder();
+					for (int i = 0; i < right.getIntValue(); i++) {
+						mulBuilder.append(right.getStringValue());
+					}
+					return new InterpreterContext(mulBuilder.toString());
+				} else {
+					// TODO: throw error
+					System.err.println("Mul operands have different types.");
+				}
+			}
+		} else
+		if (node instanceof DivASTNode) {
+			divASTNode = (DivASTNode) node;
+			left = this.interpretASTNode(divASTNode.getLeft());
+			right = this.interpretASTNode(divASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					if (right.getIntValue() == 0) {
+						// TODO: throw error
+						System.err.println("Zero division");
+					} else {
+						return new InterpreterContext(left.getIntValue() / right.getIntValue());
+					}
+				case BOOLEAN:
+					if (!right.getBooleanValue()) {
+						// TODO: throw error
+						System.err.println("Zero division");
+					} else {
+						if (left.getBooleanValue()) {
+							return new InterpreterContext(1);
+						}
+						return new InterpreterContext(0);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Div operands have different types.");
+			}
+		} else
+		if (node instanceof EqualsASTNode) {
+			equalsASTNode = (EqualsASTNode) node;
+			left = this.interpretASTNode(equalsASTNode.getLeft());
+			right = this.interpretASTNode(equalsASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() == right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().equals(right.getStringValue()));
+				case BOOLEAN:
+					return new InterpreterContext(left.getBooleanValue() == right.getBooleanValue());
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				if (left.getEvalType() == ExprEvalType.INTEGER && right.getEvalType() == ExprEvalType.BOOLEAN) {
+					if (right.getBooleanValue()) {
+						return new InterpreterContext(left.getIntValue() == 1);
+					}
+					return new InterpreterContext(left.getIntValue() == 0);
+				}
+				if (right.getEvalType() == ExprEvalType.INTEGER && left.getEvalType() == ExprEvalType.BOOLEAN) {
+					if (left.getBooleanValue()) {
+						return new InterpreterContext(right.getIntValue() == 1);
+					}
+					return new InterpreterContext(right.getIntValue() == 0);
+				}
+				return new InterpreterContext(false);
+			}
+		} else
+		if (node instanceof NotEqualsASTNode) {
+			notEqualsASTNode = (NotEqualsASTNode) node;
+			equalsASTNode = new EqualsASTNode(notEqualsASTNode.getLeft(), notEqualsASTNode.getRight());
+			var equalsContext = this.interpretASTNode(equalsASTNode);
+			if (equalsContext.getBooleanValue()) {
+				return new InterpreterContext(false);
+			}
+			return new InterpreterContext(true);
+		} else
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
 			stackScope = this.currentScope;
@@ -236,7 +377,13 @@ class ASTInterpreter {
     private InterpreterContext interpretASTNodeInteractive(ASTNode node) {
 		FunctionCallASTNode functionCallASTNode;
 		VariableAssignmentASTNode variableAssignmentASTNode;
+		InterpreterContext left, right;
 		PlusASTNode plusASTNode;
+		MinusASTNode minusASTNode;
+		MulASTNode mulASTNode;
+		DivASTNode divASTNode;
+		EqualsASTNode equalsASTNode;
+		NotEqualsASTNode notEqualsASTNode;
 		IDASTNode idASTNode;
 		InterpreterContext context;
 		if (node instanceof IntLiteralASTNode) {
@@ -333,8 +480,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof PlusASTNode) {
 			plusASTNode = (PlusASTNode) node;
-			var left = this.interpretASTNode(plusASTNode.getLeft());
-			var right = this.interpretASTNode(plusASTNode.getRight());
+			left = this.interpretASTNode(plusASTNode.getLeft());
+			right = this.interpretASTNode(plusASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -358,6 +505,136 @@ class ASTInterpreter {
 				// TODO: throw error
 				System.err.println("Plus operands have different types.");
 			}
+		} else
+		if (node instanceof MinusASTNode) {
+			minusASTNode = (MinusASTNode) node;
+			left = this.interpretASTNode(minusASTNode.getLeft());
+			right = this.interpretASTNode(minusASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() - right.getIntValue());
+				case BOOLEAN:
+					int minusBooleans = 0;
+					if (left.getBooleanValue()) {
+						minusBooleans++;
+					}
+					if (right.getBooleanValue()) {
+						minusBooleans--;
+					}
+					return new InterpreterContext(minusBooleans);
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Minus operands have different types.");
+			}
+		} else
+		if (node instanceof MulASTNode) {
+			mulASTNode = (MulASTNode) node;
+			left = this.interpretASTNode(mulASTNode.getLeft());
+			right = this.interpretASTNode(mulASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() * right.getIntValue());
+				case BOOLEAN:
+					int mulBooleans = 0;
+					if (left.getBooleanValue() && right.getBooleanValue()) {
+						mulBooleans = 1;
+					}
+					return new InterpreterContext(mulBooleans);
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				if (left.getEvalType() == ExprEvalType.STRING && right.getEvalType() == ExprEvalType.INTEGER) {
+					StringBuilder mulBuilder = new StringBuilder();
+					for (int i = 0; i < right.getIntValue(); i++) {
+						mulBuilder.append(right.getStringValue());
+					}
+					return new InterpreterContext(mulBuilder.toString());
+				} else {
+					// TODO: throw error
+					System.err.println("Mul operands have different types.");
+				}
+			}
+		} else
+		if (node instanceof DivASTNode) {
+			divASTNode = (DivASTNode) node;
+			left = this.interpretASTNode(divASTNode.getLeft());
+			right = this.interpretASTNode(divASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					if (right.getIntValue() == 0) {
+						// TODO: throw error
+						System.err.println("Zero division");
+					} else {
+						return new InterpreterContext(left.getIntValue() / right.getIntValue());
+					}
+				case BOOLEAN:
+					if (!right.getBooleanValue()) {
+						// TODO: throw error
+						System.err.println("Zero division");
+					} else {
+						if (left.getBooleanValue()) {
+							return new InterpreterContext(1);
+						}
+						return new InterpreterContext(0);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Div operands have different types.");
+			}
+		} else
+		if (node instanceof EqualsASTNode) {
+			equalsASTNode = (EqualsASTNode) node;
+			left = this.interpretASTNode(equalsASTNode.getLeft());
+			right = this.interpretASTNode(equalsASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() == right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().equals(right.getStringValue()));
+				case BOOLEAN:
+					return new InterpreterContext(left.getBooleanValue() == right.getBooleanValue());
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				if (left.getEvalType() == ExprEvalType.INTEGER && right.getEvalType() == ExprEvalType.BOOLEAN) {
+					if (right.getBooleanValue()) {
+						return new InterpreterContext(left.getIntValue() == 1);
+					}
+					return new InterpreterContext(left.getIntValue() == 0);
+				}
+				if (right.getEvalType() == ExprEvalType.INTEGER && left.getEvalType() == ExprEvalType.BOOLEAN) {
+					if (left.getBooleanValue()) {
+						return new InterpreterContext(right.getIntValue() == 1);
+					}
+					return new InterpreterContext(right.getIntValue() == 0);
+				}
+				return new InterpreterContext(false);
+			}
+		} else
+		if (node instanceof NotEqualsASTNode) {
+			notEqualsASTNode = (NotEqualsASTNode) node;
+			equalsASTNode = new EqualsASTNode(notEqualsASTNode.getLeft(), notEqualsASTNode.getRight());
+			var equalsContext = this.interpretASTNode(equalsASTNode);
+			if (equalsContext.getBooleanValue()) {
+				return new InterpreterContext(false);
+			}
+			return new InterpreterContext(true);
 		} else
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;

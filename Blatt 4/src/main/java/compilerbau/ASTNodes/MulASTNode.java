@@ -8,6 +8,14 @@ public class MulASTNode extends ASTNode {
 		this.right = right;
 	}
 
+	public ASTNode getLeft() {
+		return this.left;
+	}
+
+	public ASTNode getRight() {
+		return this.right;
+	}
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "MulASTNode");
