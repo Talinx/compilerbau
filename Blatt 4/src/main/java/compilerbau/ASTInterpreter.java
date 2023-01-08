@@ -657,15 +657,15 @@ class ASTInterpreter {
 		if (node instanceof VariableAssignmentASTNode) {
 			variableAssignmentASTNode = (VariableAssignmentASTNode) node;
             var name = variableAssignmentASTNode.getId().id.getText();
-			var value = this.interpretASTNode(variableAssignmentASTNode.getExpr());
+			var value = this.interpretASTNodeInteractive(variableAssignmentASTNode.getExpr());
             
             currentEnvironment.setValue(name, value);
 			return null;
 		} else
 		if (node instanceof PlusASTNode) {
 			plusASTNode = (PlusASTNode) node;
-			left = this.interpretASTNode(plusASTNode.getLeft());
-			right = this.interpretASTNode(plusASTNode.getRight());
+			left = this.interpretASTNodeInteractive(plusASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(plusASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -692,8 +692,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof MinusASTNode) {
 			minusASTNode = (MinusASTNode) node;
-			left = this.interpretASTNode(minusASTNode.getLeft());
-			right = this.interpretASTNode(minusASTNode.getRight());
+			left = this.interpretASTNodeInteractive(minusASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(minusASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -718,8 +718,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof MulASTNode) {
 			mulASTNode = (MulASTNode) node;
-			left = this.interpretASTNode(mulASTNode.getLeft());
-			right = this.interpretASTNode(mulASTNode.getRight());
+			left = this.interpretASTNodeInteractive(mulASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(mulASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -749,8 +749,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof DivASTNode) {
 			divASTNode = (DivASTNode) node;
-			left = this.interpretASTNode(divASTNode.getLeft());
-			right = this.interpretASTNode(divASTNode.getRight());
+			left = this.interpretASTNodeInteractive(divASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(divASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -781,8 +781,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof EqualsASTNode) {
 			equalsASTNode = (EqualsASTNode) node;
-			left = this.interpretASTNode(equalsASTNode.getLeft());
-			right = this.interpretASTNode(equalsASTNode.getRight());
+			left = this.interpretASTNodeInteractive(equalsASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(equalsASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -814,7 +814,7 @@ class ASTInterpreter {
 		if (node instanceof NotEqualsASTNode) {
 			notEqualsASTNode = (NotEqualsASTNode) node;
 			equalsASTNode = new EqualsASTNode(notEqualsASTNode.getLeft(), notEqualsASTNode.getRight());
-			var equalsContext = this.interpretASTNode(equalsASTNode);
+			var equalsContext = this.interpretASTNodeInteractive(equalsASTNode);
 			if (equalsContext.getBooleanValue()) {
 				return new InterpreterContext(false);
 			}
@@ -822,8 +822,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof LessASTNode) {
 			lessASTNode = (LessASTNode) node;
-			left = this.interpretASTNode(lessASTNode.getLeft());
-			right = this.interpretASTNode(lessASTNode.getRight());
+			left = this.interpretASTNodeInteractive(lessASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(lessASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -850,8 +850,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof LessEqualsASTNode) {
 			lessEqualsASTNode = (LessEqualsASTNode) node;
-			left = this.interpretASTNode(lessEqualsASTNode.getLeft());
-			right = this.interpretASTNode(lessEqualsASTNode.getRight());
+			left = this.interpretASTNodeInteractive(lessEqualsASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(lessEqualsASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -878,8 +878,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof GreaterASTNode) {
 			greaterASTNode = (GreaterASTNode) node;
-			left = this.interpretASTNode(greaterASTNode.getLeft());
-			right = this.interpretASTNode(greaterASTNode.getRight());
+			left = this.interpretASTNodeInteractive(greaterASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(greaterASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -906,8 +906,8 @@ class ASTInterpreter {
 		} else
 		if (node instanceof GreaterEqualsASTNode) {
 			greaterEqualsASTNode = (GreaterEqualsASTNode) node;
-			left = this.interpretASTNode(greaterEqualsASTNode.getLeft());
-			right = this.interpretASTNode(greaterEqualsASTNode.getRight());
+			left = this.interpretASTNodeInteractive(greaterEqualsASTNode.getLeft());
+			right = this.interpretASTNodeInteractive(greaterEqualsASTNode.getRight());
 			if (left.getEvalType() == right.getEvalType()) {
 				switch(left.getEvalType()) {
 				case INTEGER:
@@ -934,48 +934,48 @@ class ASTInterpreter {
 		} else
 		if (node instanceof AndASTNode) {
 			andASTNode = (AndASTNode) node;
-			left = this.interpretASTNode(andASTNode.getLeft());
+			left = this.interpretASTNodeInteractive(andASTNode.getLeft());
 			if (left.isTruthy()) {
-				right = this.interpretASTNode(andASTNode.getRight());
+				right = this.interpretASTNodeInteractive(andASTNode.getRight());
 				return right;
 			}
 			return left;
 		} else
 		if (node instanceof OrASTNode) {
 			orASTNode = (OrASTNode) node;
-			left = this.interpretASTNode(orASTNode.getLeft());
+			left = this.interpretASTNodeInteractive(orASTNode.getLeft());
 			if (left.isTruthy()) {
 				return left;
 			}
-			right = this.interpretASTNode(orASTNode.getRight());
+			right = this.interpretASTNodeInteractive(orASTNode.getRight());
 			return right;
 		} else
 		if (node instanceof IfASTNode) {
 			ifASTNode = (IfASTNode) node;
-			condition = this.interpretASTNode(ifASTNode.getCondition());
+			condition = this.interpretASTNodeInteractive(ifASTNode.getCondition());
 			if (condition.isTruthy()) {
-				return this.interpretASTNode(ifASTNode.getBody());
+				return this.interpretASTNodeInteractive(ifASTNode.getBody());
 			}
 			var elifs = ifASTNode.getElifs();
 			for (int i = 0; i < elifs.size(); i++) {
 				ElifASTNode cNode = elifs.get(i);
-				condition = this.interpretASTNode(cNode.getCondition());
+				condition = this.interpretASTNodeInteractive(cNode.getCondition());
 				if (condition.isTruthy()) {
-					return this.interpretASTNode(cNode.getBody());
+					return this.interpretASTNodeInteractive(cNode.getBody());
 				}
 			}
 			var elseNode = ifASTNode.getElse();
 			if (elseNode != null) {
-				return this.interpretASTNode(elseNode.getBody());
+				return this.interpretASTNodeInteractive(elseNode.getBody());
 			}
 			return new InterpreterContext(ExprEvalType.NONE);
 		} else
 		if (node instanceof WhileASTNode) {
 			whileASTNode = (WhileASTNode) node;
-			condition = this.interpretASTNode(whileASTNode.getCondition());
+			condition = this.interpretASTNodeInteractive(whileASTNode.getCondition());
 			while (condition.isTruthy()) {
-				this.interpretASTNode(whileASTNode.getBody());
-				condition = this.interpretASTNode(whileASTNode.getCondition());
+				this.interpretASTNodeInteractive(whileASTNode.getBody());
+				condition = this.interpretASTNodeInteractive(whileASTNode.getCondition());
 			}
 			return new InterpreterContext(ExprEvalType.NONE);
 		} else
