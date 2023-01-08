@@ -22,6 +22,10 @@ import compilerbau.ASTNodes.MulASTNode;
 import compilerbau.ASTNodes.DivASTNode;
 import compilerbau.ASTNodes.EqualsASTNode;
 import compilerbau.ASTNodes.NotEqualsASTNode;
+import compilerbau.ASTNodes.LessASTNode;
+import compilerbau.ASTNodes.LessEqualsASTNode;
+import compilerbau.ASTNodes.GreaterASTNode;
+import compilerbau.ASTNodes.GreaterEqualsASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
 import compilerbau.ASTNodes.VariableAssignmentASTNode;
 import compilerbau.Environment;
@@ -108,6 +112,10 @@ class ASTInterpreter {
 		DivASTNode divASTNode;
 		EqualsASTNode equalsASTNode;
 		NotEqualsASTNode notEqualsASTNode;
+		LessASTNode lessASTNode;
+		LessEqualsASTNode lessEqualsASTNode;
+		GreaterASTNode greaterASTNode;
+		GreaterEqualsASTNode greaterEqualsASTNode;
 		IDASTNode idASTNode;
 		List<ASTNode> astNodes;
 		InterpreterContext context, left, right;
@@ -359,6 +367,118 @@ class ASTInterpreter {
 			}
 			return new InterpreterContext(true);
 		} else
+		if (node instanceof LessASTNode) {
+			lessASTNode = (LessASTNode) node;
+			left = this.interpretASTNode(lessASTNode.getLeft());
+			right = this.interpretASTNode(lessASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() < right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() < right.getStringValue().length());
+				case BOOLEAN:
+					if (left.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						if (right.getBooleanValue()) {
+							return new InterpreterContext(true);
+						}
+						return new InterpreterContext(false);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Less operands have different types.");
+			}
+		} else
+		if (node instanceof LessEqualsASTNode) {
+			lessEqualsASTNode = (LessEqualsASTNode) node;
+			left = this.interpretASTNode(lessEqualsASTNode.getLeft());
+			right = this.interpretASTNode(lessEqualsASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() <= right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() <= right.getStringValue().length());
+				case BOOLEAN:
+					if (left.getBooleanValue() == right.getBooleanValue()) {
+						return new InterpreterContext(true);
+					}
+					if (left.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						return new InterpreterContext(true);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Less equals operands have different types.");
+			}
+		} else
+		if (node instanceof GreaterASTNode) {
+			greaterASTNode = (GreaterASTNode) node;
+			left = this.interpretASTNode(greaterASTNode.getLeft());
+			right = this.interpretASTNode(greaterASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() > right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() > right.getStringValue().length());
+				case BOOLEAN:
+					if (right.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						if (left.getBooleanValue()) {
+							return new InterpreterContext(true);
+						}
+						return new InterpreterContext(false);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Greater operands have different types.");
+			}
+		} else
+		if (node instanceof GreaterEqualsASTNode) {
+			greaterEqualsASTNode = (GreaterEqualsASTNode) node;
+			left = this.interpretASTNode(greaterEqualsASTNode.getLeft());
+			right = this.interpretASTNode(greaterEqualsASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() >= right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() >= right.getStringValue().length());
+				case BOOLEAN:
+					if (left.getBooleanValue() == right.getBooleanValue()) {
+						return new InterpreterContext(true);
+					}
+					if (right.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						return new InterpreterContext(true);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Greater equals operands have different types.");
+			}
+		} else
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
 			stackScope = this.currentScope;
@@ -384,6 +504,10 @@ class ASTInterpreter {
 		DivASTNode divASTNode;
 		EqualsASTNode equalsASTNode;
 		NotEqualsASTNode notEqualsASTNode;
+		LessASTNode lessASTNode;
+		LessEqualsASTNode lessEqualsASTNode;
+		GreaterASTNode greaterASTNode;
+		GreaterEqualsASTNode greaterEqualsASTNode;
 		IDASTNode idASTNode;
 		InterpreterContext context;
 		if (node instanceof IntLiteralASTNode) {
@@ -635,6 +759,118 @@ class ASTInterpreter {
 				return new InterpreterContext(false);
 			}
 			return new InterpreterContext(true);
+		} else
+		if (node instanceof LessASTNode) {
+			lessASTNode = (LessASTNode) node;
+			left = this.interpretASTNode(lessASTNode.getLeft());
+			right = this.interpretASTNode(lessASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() < right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() < right.getStringValue().length());
+				case BOOLEAN:
+					if (left.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						if (right.getBooleanValue()) {
+							return new InterpreterContext(true);
+						}
+						return new InterpreterContext(false);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Less operands have different types.");
+			}
+		} else
+		if (node instanceof LessEqualsASTNode) {
+			lessEqualsASTNode = (LessEqualsASTNode) node;
+			left = this.interpretASTNode(lessEqualsASTNode.getLeft());
+			right = this.interpretASTNode(lessEqualsASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() <= right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() <= right.getStringValue().length());
+				case BOOLEAN:
+					if (left.getBooleanValue() == right.getBooleanValue()) {
+						return new InterpreterContext(true);
+					}
+					if (left.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						return new InterpreterContext(true);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Less equals operands have different types.");
+			}
+		} else
+		if (node instanceof GreaterASTNode) {
+			greaterASTNode = (GreaterASTNode) node;
+			left = this.interpretASTNode(greaterASTNode.getLeft());
+			right = this.interpretASTNode(greaterASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() > right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() > right.getStringValue().length());
+				case BOOLEAN:
+					if (right.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						if (left.getBooleanValue()) {
+							return new InterpreterContext(true);
+						}
+						return new InterpreterContext(false);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Greater operands have different types.");
+			}
+		} else
+		if (node instanceof GreaterEqualsASTNode) {
+			greaterEqualsASTNode = (GreaterEqualsASTNode) node;
+			left = this.interpretASTNode(greaterEqualsASTNode.getLeft());
+			right = this.interpretASTNode(greaterEqualsASTNode.getRight());
+			if (left.getEvalType() == right.getEvalType()) {
+				switch(left.getEvalType()) {
+				case INTEGER:
+					return new InterpreterContext(left.getIntValue() >= right.getIntValue());
+				case STRING:
+					return new InterpreterContext(left.getStringValue().length() >= right.getStringValue().length());
+				case BOOLEAN:
+					if (left.getBooleanValue() == right.getBooleanValue()) {
+						return new InterpreterContext(true);
+					}
+					if (right.getBooleanValue()) {
+						return new InterpreterContext(false);
+					} else {
+						return new InterpreterContext(true);
+					}
+				default:
+					// TODO: throw error
+					System.err.println("Unsupported operands.");
+				}
+			} else {
+				// TODO: throw error
+				System.err.println("Greater equals operands have different types.");
+			}
 		} else
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
