@@ -18,6 +18,8 @@ public class BuiltinEnvironment extends Environment {
         String inputString;
         try {
             inputString = Files.readString(Path.of(filePath));
+            inputString = inputString.replaceAll("\r\n","\n");
+            inputString = inputString + "\n";
             var interpreterBuilder = new ASTInterpreterBuilder();
             interpreterBuilder.getInstance().interpretInteractive(inputString);
         } catch (IOException e) {
