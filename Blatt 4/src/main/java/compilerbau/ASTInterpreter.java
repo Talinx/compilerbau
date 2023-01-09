@@ -31,6 +31,7 @@ import compilerbau.ASTNodes.OrASTNode;
 import compilerbau.ASTNodes.IfASTNode;
 import compilerbau.ASTNodes.ElifASTNode;
 import compilerbau.ASTNodes.WhileASTNode;
+import compilerbau.ASTNodes.BodyASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
 import compilerbau.ASTNodes.VariableAssignmentASTNode;
 import compilerbau.Environment;
@@ -71,9 +72,9 @@ class ASTInterpreter {
         var lexer = new MiniPythonLexer(inputStream);
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new MiniPythonParser(tokenStream);
-        var cst = parser.startfile();
+        var cst = parser.start();
         var astVisitor = new ASTVisitor();
-        var ast = (AST) astVisitor.visitStartfile(cst);
+        var ast = (AST) astVisitor.visitStart(cst);
 
 		List<ASTNode> nodes = ast.getContent();
 		for (int i = 0; i < nodes.size(); i++) {
@@ -111,6 +112,7 @@ class ASTInterpreter {
 		Symbol symbol;
 		FunctionCallASTNode functionCallASTNode;
 		VariableAssignmentASTNode variableAssignmentASTNode;
+		BodyASTNode bodyASTNode;
 		PlusASTNode plusASTNode;
 		MinusASTNode minusASTNode;
 		MulASTNode mulASTNode;
@@ -132,6 +134,13 @@ class ASTInterpreter {
 		ClassScope currentClassScope;
 		ASTNode tempNode;
 		FunctionDefinitionASTNode functionDefinitionASTNode;
+		if (node instanceof BodyASTNode) {
+			bodyASTNode = (BodyASTNode) node;
+			var content = bodyASTNode.getContent();
+			for (int i = 0; i < content.size(); i++) {
+				this.interpretASTNode(content.get(i));
+			}
+		} else
 		if (node instanceof IntLiteralASTNode) {
 			return InterpreterContext.from((IntLiteralASTNode) node);
 		} else
@@ -554,6 +563,7 @@ class ASTInterpreter {
 		FunctionCallASTNode functionCallASTNode;
 		VariableAssignmentASTNode variableAssignmentASTNode;
 		InterpreterContext left, right, condition;
+		BodyASTNode bodyASTNode;
 		PlusASTNode plusASTNode;
 		MinusASTNode minusASTNode;
 		MulASTNode mulASTNode;
@@ -570,6 +580,13 @@ class ASTInterpreter {
 		IfASTNode ifASTNode;
 		WhileASTNode whileASTNode;
 		InterpreterContext context;
+		if (node instanceof BodyASTNode) {
+			bodyASTNode = (BodyASTNode) node;
+			var content = bodyASTNode.getContent();
+			for (int i = 0; i < content.size(); i++) {
+				this.interpretASTNodeInteractive(content.get(i));
+			}
+		} else
 		if (node instanceof IntLiteralASTNode) {
 			return InterpreterContext.from((IntLiteralASTNode) node);
 		} else

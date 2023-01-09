@@ -76,7 +76,7 @@ class MiniPythonInterpreter {
                 System.out.print("... ");
                 var input = scanner.nextLine();
                 if (input.isBlank()){
-                    interpreterBuilder.getInstance().interpretInteractive(tempStorage);
+                    interpreterBuilder.getInstance().interpretInteractive(tempStorage + "\n");
                     isInMultiLine = false;
                     tempStorage = null;
                 }
