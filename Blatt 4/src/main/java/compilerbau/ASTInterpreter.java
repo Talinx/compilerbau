@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.lang.StringBuilder;
 
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -71,7 +72,13 @@ class ASTInterpreter {
         var lexer = new MiniPythonLexer(inputStream);
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new MiniPythonParser(tokenStream);
+        SyntaxErrorListener listener = new SyntaxErrorListener();
+        parser.addErrorListener(listener);
         var cst = parser.startfile();
+
+        if (listener.getSyntaxErrors().size() > 0)
+            return;
+
         var astVisitor = new ASTVisitor();
         var ast = (AST) astVisitor.visitStartfile(cst);
 

@@ -20,6 +20,8 @@ public class BuiltinEnvironment extends Environment {
             inputString = Files.readString(Path.of(filePath));
             var interpreterBuilder = new ASTInterpreterBuilder();
             interpreterBuilder.getInstance().interpretInteractive(inputString);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            System.out.println("Failed to load file " + filePath);
+        }
     }
 }
