@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import compilerbau.ASTNodes.BooleanLiteralASTNode;
+import compilerbau.ASTNodes.ClassASTNode;
 import compilerbau.ASTNodes.FunctionDefinitionASTNode;
 import compilerbau.ASTNodes.IntLiteralASTNode;
 import compilerbau.ASTNodes.StringLiteralASTNode;
@@ -15,6 +16,8 @@ class InterpreterContext {
 	String strV;
 	boolean booleanV;
     FunctionDefinitionASTNode AstRefV;
+    Environment ClassEnv;
+    ClassASTNode classAstRef;
     Function<Object, Object> JavaFuncRefV;
     Consumer<String> JavaConsRefV;
 
@@ -42,6 +45,11 @@ class InterpreterContext {
 		this.AstRefV = astNodeRef;
 	}
 
+    public InterpreterContext(Environment classEnv) {
+		this.evalType = ExprEvalType.CLASSENV;
+		this.ClassEnv = classEnv;
+	}
+
     public InterpreterContext(Function<Object, Object> javaFuncRefV) {
 		this.evalType = ExprEvalType.BUILTINFUNC;
 		this.JavaFuncRefV = javaFuncRefV;
@@ -50,6 +58,11 @@ class InterpreterContext {
     public InterpreterContext(Consumer<String> javaFuncRefV) {
 		this.evalType = ExprEvalType.BUILTINFUNC;
 		this.JavaConsRefV = javaFuncRefV;
+	}
+
+    public InterpreterContext(ClassASTNode classAstRef) {
+		this.evalType = ExprEvalType.CLASS;
+		this.classAstRef = classAstRef;
 	}
 
 	public int getIntValue() {

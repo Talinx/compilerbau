@@ -3,6 +3,7 @@ l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTInterpreter.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\MiniPythonBaseListener.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\ArgumentsASTNode.java
+l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\SyntaxErrorListener.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ClassScope.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\NotEqualsASTNode.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\StringLiteralASTNode.java
@@ -10,6 +11,7 @@ l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\ParametersASTNode.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\GreaterEqualsASTNode.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\FunctionContentASTNode.java
+l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\SyntaxError.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\FunctionCallASTNode.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\ASTNodes\ElifASTNode.java
 l:\Pogrammier Projekte\FHBielefeld\Master\CompilerBau\Praktikum\Blatt 4\src\main\java\compilerbau\MiniPythonListener.java

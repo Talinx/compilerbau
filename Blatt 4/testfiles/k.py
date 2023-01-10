@@ -1,6 +1,6 @@
 class A:
     def method_1(self):
-        ...
+        a = 0
     #end
 #end
 
@@ -15,12 +15,7 @@ class B(A):
 #end
 
 def b(c):
-    1
-    2
     if c > 3:
-        1
-        ...
-        2
         print("Hello")
     else:
         pass

@@ -21,6 +21,7 @@ public class Environment {
 		var symbolFromThisScope = values.get(id);
 		if (symbolFromThisScope != null) {
 			values.put(id, value);
+            return;
 		}
 		if (enclosingEnv != null) {
 			var ret = enclosingEnv.setValueEnclosing(id, value);

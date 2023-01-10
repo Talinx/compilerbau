@@ -6,5 +6,7 @@ enum ExprEvalType {
 	STRING,
 	BOOLEAN,
     FUNCASTNODE,
-    BUILTINFUNC
+    BUILTINFUNC,
+    CLASS,
+    CLASSENV
 }

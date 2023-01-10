@@ -22,6 +22,10 @@ public class ClassASTNode extends ASTNode {
 		return this.name;
 	}
 
+    public List<VariableAssignmentASTNode> getVariableAssignments() {
+        return this.variables;
+    }
+
 	@Override
 	public void print(int level) {
 		System.out.println(baseIndentation(level) + "Class " + this.name.id.getText());

@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import compilerbau.ASTNodes.ASTNode;
 import compilerbau.ASTNodes.BooleanLiteralASTNode;
+import compilerbau.ASTNodes.ClassASTNode;
 import compilerbau.ASTNodes.FunctionCallASTNode;
 import compilerbau.ASTNodes.FunctionDefinitionASTNode;
 import compilerbau.ASTNodes.IDASTNode;
@@ -605,86 +606,179 @@ class ASTInterpreter {
 		} else
 		if (node instanceof FunctionCallASTNode) {
 			functionCallASTNode = (FunctionCallASTNode) node;
-			context = currentEnvironment.getValue(functionCallASTNode.getId().getText());
-			if (context == null) {
-				// throw error
-				System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
-			}
-            if (context.getEvalType() == ExprEvalType.BUILTINFUNC) {
+            var id = functionCallASTNode.getId().getTextClass();
+            if (id == null) {
+                context = currentEnvironment.getValue(functionCallASTNode.getId().getText());
+                if (context == null) {
+                    // throw error
+                    System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
+                    return null;
+                }
+                if (context.getEvalType() == ExprEvalType.BUILTINFUNC) {
+                    var paramAstNodes = functionCallASTNode.getArguments();
+                    if (paramAstNodes.size() != 1) {
+                        System.err.println("Function " + functionCallASTNode.getId().getText() + " expected " + 
+                                            1 + " Arguments but got " + paramAstNodes.size());
+                        return null;
+                    }
+                    var value = interpretASTNodeInteractive(paramAstNodes.get(0));
+                    switch (value.getEvalType()) {
+                        case INTEGER:
+                            context.JavaConsRefV.accept(Integer.toString(value.getIntValue()));
+                            break;
+                        case STRING:
+                            context.JavaConsRefV.accept(value.getStringValue());
+                            break;
+                        case BOOLEAN:
+                            if (value.getBooleanValue())
+                                context.JavaConsRefV.accept("True");
+                            else
+                                context.JavaConsRefV.accept("False");
+                            break;
+                        default:
+                            break;
+                    }
+                    return null;
+                } else
+                if (context.getEvalType() == ExprEvalType.CLASS) {
+                    var classASTNode = context.classAstRef;
+                    var classEnv = new Environment(currentEnvironment);
+                    currentEnvironment = classEnv;
+
+                    for (var func: classASTNode.getFunctionDefinitons()) {
+                        var state = this.interpretASTNodeInteractive(func);
+                        if (state == null)
+                            System.err.println("Cant interpret method " + func.getId().getText());
+                    }
+
+                    for (var variable: classASTNode.getVariableAssignments()) {
+                        this.interpretASTNodeInteractive(variable);
+                    }
+
+                    currentEnvironment.setValue("self", new InterpreterContext(classEnv));
+
+                    currentEnvironment = currentEnvironment.enclosingEnv;
+                    context = new InterpreterContext(classEnv);
+                    return context;
+                }
+
+                if (!(context.getEvalType() == ExprEvalType.FUNCASTNODE)) {
+                    // throw error
+                    System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
+                }
+            
                 var paramAstNodes = functionCallASTNode.getArguments();
-                if (paramAstNodes.size() != 1) {
+                var argAstNodes = context.AstRefV.getParametersASTNodes();
+                
+                if (paramAstNodes.size() != argAstNodes.size()) {
                     System.err.println("Function " + functionCallASTNode.getId().getText() + " expected " + 
-                                        1 + " Arguments but got " + paramAstNodes.size());
+                                        argAstNodes.size() + " Arguments but got " + paramAstNodes.size());
                     return null;
                 }
-                var value = interpretASTNodeInteractive(paramAstNodes.get(0));
-                switch (value.getEvalType()) {
-                    case INTEGER:
-                        context.JavaConsRefV.accept(Integer.toString(value.getIntValue()));
-                        break;
-                    case STRING:
-                        context.JavaConsRefV.accept(value.getStringValue());
-                        break;
-                    case BOOLEAN:
-                        if (value.getBooleanValue())
-                            context.JavaConsRefV.accept("True");
-                        else
-                            context.JavaConsRefV.accept("False");
-                        break;
-                    default:
-                        break;
+
+                var paramEnv = new Environment(currentEnvironment);
+                currentEnvironment = paramEnv;
+                
+                for (int i = 0; i < paramAstNodes.size(); i++) {
+                    var name = argAstNodes.get(i).getId().id.getText();
+                    var value = interpretASTNodeInteractive(paramAstNodes.get(i));
+                    if (value == null) {
+                        System.err.println("Argument " + i + " of Function " + functionCallASTNode.getId().getText() + "could not be interpreted");
+                        return null;
+                    }
+                    paramEnv.setValue(name, value);
                 }
-                return null;
-            }
-			if (!(context.getEvalType() == ExprEvalType.FUNCASTNODE)) {
-				// throw error
-				System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
-			}
+                
+                var bodyEnv = new Environment(currentEnvironment);
+                currentEnvironment = bodyEnv;
+                
+                for (var bodyNode : context.AstRefV.getBody()) {
+                    interpretASTNodeInteractive(bodyNode);
+                }
 
-			var paramAstNodes = functionCallASTNode.getArguments();
-            var argAstNodes = context.AstRefV.getParametersASTNodes();
-            
-            if (paramAstNodes.size() != argAstNodes.size()) {
-                System.err.println("Function " + functionCallASTNode.getId().getText() + " expected " + 
-                                    argAstNodes.size() + " Arguments but got " + paramAstNodes.size());
-                return null;
-            }
+                var oldBodyEnv = currentEnvironment;
+                currentEnvironment = currentEnvironment.enclosingEnv;
+                oldBodyEnv.enclosingEnv = null;
 
-            var paramEnv = new Environment(currentEnvironment);
-            currentEnvironment = paramEnv;
-            
-            for (int i = 0; i < paramAstNodes.size(); i++) {
-                var name = argAstNodes.get(i).getId().id.getText();
-                var value = interpretASTNodeInteractive(paramAstNodes.get(i));
-                if (value == null) {
-                    System.err.println("Argument " + i + " of Function " + functionCallASTNode.getId().getText() + "could not be interpreted");
+                var oldParamEnv = currentEnvironment;
+                currentEnvironment = currentEnvironment.enclosingEnv;
+                oldParamEnv.enclosingEnv = null;
+            }
+            else {
+                var classContext = currentEnvironment.getValue(id);
+                context = classContext.ClassEnv.getValue(functionCallASTNode.getId().getTextId());
+                if (context == null) {
+                    // throw error
+                    System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
                     return null;
                 }
-                paramEnv.setValue(name, value);
-            }
-            
-            var bodyEnv = new Environment(currentEnvironment);
-            currentEnvironment = bodyEnv;
-            
-            for (var bodyNode : context.AstRefV.getBody()) {
-                interpretASTNodeInteractive(bodyNode);
-            }
 
-            var oldBodyEnv = currentEnvironment;
-            currentEnvironment = currentEnvironment.enclosingEnv;
-            oldBodyEnv.enclosingEnv = null;
+                if (!(context.getEvalType() == ExprEvalType.FUNCASTNODE)) {
+                    // throw error
+                    System.err.println("Function " + functionCallASTNode.getId().getText() + " not found.");
+                }
+            
+                var paramAstNodes = functionCallASTNode.getArguments();
+                var argAstNodes = context.AstRefV.getParametersASTNodes();
+                
+                argAstNodes.remove(0);
+                
+                if (paramAstNodes.size() != argAstNodes.size()) {
+                    System.err.println("Function " + functionCallASTNode.getId().getText() + " expected " + 
+                                        argAstNodes.size() + " Arguments but got " + paramAstNodes.size());
+                    return null;
+                }
+                
+                var oldEnv = currentEnvironment;
 
-            var oldParamEnv = currentEnvironment;
-            currentEnvironment = currentEnvironment.enclosingEnv;
-            oldParamEnv.enclosingEnv = null;
+                currentEnvironment = classContext.ClassEnv;
+                var paramEnv = new Environment(currentEnvironment);
+                currentEnvironment = paramEnv;
+                
+                for (int i = 0; i < paramAstNodes.size(); i++) {
+                    var name = argAstNodes.get(i).getId().id.getText();
+                    var value = interpretASTNodeInteractive(paramAstNodes.get(i));
+                    if (value == null) {
+                        System.err.println("Argument " + i + " of Function " + functionCallASTNode.getId().getText() + "could not be interpreted");
+                        return null;
+                    }
+                    paramEnv.setValue(name, value);
+                }
+                
+                var bodyEnv = new Environment(currentEnvironment);
+                currentEnvironment = bodyEnv;
+                
+                for (var bodyNode : context.AstRefV.getBody()) {
+                    interpretASTNodeInteractive(bodyNode);
+                }
+
+                var oldBodyEnv = currentEnvironment;
+                currentEnvironment = currentEnvironment.enclosingEnv;
+                oldBodyEnv.enclosingEnv = null;
+
+                var oldParamEnv = currentEnvironment;
+                currentEnvironment = currentEnvironment.enclosingEnv;
+                oldParamEnv.enclosingEnv = null;
+
+                currentEnvironment = oldEnv;
+            }
 		} else
 		if (node instanceof VariableAssignmentASTNode) {
 			variableAssignmentASTNode = (VariableAssignmentASTNode) node;
-            var name = variableAssignmentASTNode.getId().id.getText();
-			var value = this.interpretASTNodeInteractive(variableAssignmentASTNode.getExpr());
-            
-            currentEnvironment.setValue(name, value);
-			return null;
+            if (!variableAssignmentASTNode.getId().belongsToClass()) {
+                var name = variableAssignmentASTNode.getId().id.getText();
+                var value = this.interpretASTNodeInteractive(variableAssignmentASTNode.getExpr());
+                
+                currentEnvironment.setValue(name, value);
+                return null;
+            }
+            else {
+                var classEnv = currentEnvironment.getValue(variableAssignmentASTNode.getId().getTextClass());
+                
+                var name = variableAssignmentASTNode.getId().id.getText();
+                var value = this.interpretASTNodeInteractive(variableAssignmentASTNode.getExpr());
+                classEnv.ClassEnv.setValue(name, value);
+            }
 		} else
 		if (node instanceof PlusASTNode) {
 			plusASTNode = (PlusASTNode) node;
@@ -1005,15 +1099,28 @@ class ASTInterpreter {
 		} else
 		if (node instanceof IDASTNode) {
 			idASTNode = (IDASTNode) node;
-			// if (idASTNode.belongsToClass()) {
-			// 	stackScope = currentEnvironment.resolveClass(idASTNode.getTextClass());
-			// }
+			if (idASTNode.belongsToClass()) {
+				var classContext = currentEnvironment.getValue(idASTNode.getTextClass());
+                return classContext.ClassEnv.getValue(idASTNode.getTextId());
+			}
 			context = currentEnvironment.getValue(idASTNode.getTextId());
 			if (context == null) {
 				return new InterpreterContext(ExprEvalType.NONE);
 			}
 			return context;
-		}
+		} else
+        if (node instanceof ClassASTNode) {
+            var classASTNode = (ClassASTNode) node;
+            context = new InterpreterContext(classASTNode);
+            currentEnvironment.setValue(classASTNode.getId().getText(), context);
+        }
+        if (node instanceof FunctionDefinitionASTNode) {
+            var funcDefASTNode = (FunctionDefinitionASTNode) node;
+            var name = funcDefASTNode.getId().getText();
+            context = new InterpreterContext(funcDefASTNode);
+            currentEnvironment.setValue(name, context);
+        }
+
 		return new InterpreterContext(ExprEvalType.NONE);
 	}
 }
